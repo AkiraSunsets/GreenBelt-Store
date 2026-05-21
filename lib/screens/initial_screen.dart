@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:greenbelt_flutter/screens/onboarding_screen.dart';
 
 class StartApp extends StatefulWidget {
   const StartApp({super.key});
@@ -49,7 +50,12 @@ class _StartAppState extends State<StartApp> {
                         height: 60,
                         child: ElevatedButton(
                           onPressed: () {
-                            print("Button Pressed");
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const TesteSplashScreen(),
+                              ),
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF881F72),

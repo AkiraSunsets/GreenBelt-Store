@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:greenbelt_flutter/screens/initial_screen.dart';
 import 'package:greenbelt_flutter/screens/onboarding_screen.dart';
+import 'package:greenbelt_flutter/screens/start_screen.dart';
 
 void main(){
   runApp(const MyApp());
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.montserratTextTheme(),
         primaryTextTheme: GoogleFonts.montserratTextTheme(),
       ),
-      home: const TesteSplashScreen()
+      home: const StartPage(),
     );
   }
 }

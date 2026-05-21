@@ -144,7 +144,7 @@ class _TesteSplashScreenState extends State<TesteSplashScreen> {
                             duration: const Duration(milliseconds: 500),
                             curve: Curves.ease,
                           );
-                        }
+                        } 
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF881F72),
