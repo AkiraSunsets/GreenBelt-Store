@@ -2,22 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart'
     as smooth_page_indicator;
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: TesteSplashScreen(),
-    );
-  }
-}
+import 'package:greenbelt_flutter/screens/start_screen.dart';
 
 class TesteSplashScreen extends StatefulWidget {
   const TesteSplashScreen({super.key});
@@ -54,6 +39,12 @@ class _TesteSplashScreenState extends State<TesteSplashScreen> {
   ];
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -76,7 +67,6 @@ class _TesteSplashScreenState extends State<TesteSplashScreen> {
                       fit: BoxFit.cover,
                     ),
                   ),
-
                   const SizedBox(height: 40),
 
                   Row(
@@ -93,6 +83,7 @@ class _TesteSplashScreenState extends State<TesteSplashScreen> {
 
                       if (item["title2"]!.isNotEmpty) ...[
                         const SizedBox(width: 6),
+
                         Text(
                           item["title2"]!,
                           style: GoogleFonts.montserrat(
@@ -144,7 +135,14 @@ class _TesteSplashScreenState extends State<TesteSplashScreen> {
                             duration: const Duration(milliseconds: 500),
                             curve: Curves.ease,
                           );
-                        } 
+                        } else {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const StartScreen(),
+                            ),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF881F72),
