@@ -10,7 +10,7 @@ import 'package:greenbelt_flutter/models/app_state.dart';
 
 import 'package:greenbelt_flutter/screens/home_screen.dart';
 
-void main(){
+void main() {
   runApp(const MyApp());
 }
 
@@ -19,13 +19,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        textTheme: GoogleFonts.montserratTextTheme(),
-        primaryTextTheme: GoogleFonts.montserratTextTheme(),
+    // Envolvemos o MaterialApp com o AppStateProvider para 
+    // disponibilizar o estado global em toda a árvore de widgets.
+    return AppStateProvider(
+      state: AppState(), // Instanciamos o estado aqui no topo
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          textTheme: GoogleFonts.montserratTextTheme(),
+          primaryTextTheme: GoogleFonts.montserratTextTheme(),
+        ),
+        home: const StartApp(),
       ),
-      home: const StartApp(),
     );
   }
 }

@@ -1,7 +1,13 @@
+// lib/screens/checkout_screen.dart
+// C7: Persistência de pedido no banco de dados interno (SQLite)
+// C8: Integração com API (estrutura preparada para POST do pedido)
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../models/app_state.dart';
+import '../models/produto.dart';
+import '../services/database_service.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -121,8 +127,30 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  void _placeOrder(AppState state) {
+  // C7: Salva o pedido no SQLite antes de limpar o carrinho
+  Future<void> _placeOrder(AppState state) async {
+    // Monta a lista de itens para salvar no banco
+    final itens = state.cartItems
+        .map((i) => {
+              'nome': i.produto.nome,
+              'categoria': i.produto.categoria, // C11: usa o getter da POO
+              'quantidade': i.quantidade,
+              'precoUnit': i.produto.preco,
+              'subtotal': i.subtotal,
+            })
+        .toList();
+
+    // C7: Persiste o pedido localmente no SQLite
+    await DatabaseService.salvarPedido(
+      total: state.totalCost,
+      frete: _shippingType,
+      itens: itens,
+    );
+
     state.clearCart();
+
+    if (!mounted) return;
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -208,7 +236,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Shipping Address
             _SectionTitle(title: 'Shipping Address'),
             const SizedBox(height: 12),
             _InfoTile(
@@ -218,10 +245,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               actionLabel: 'CHANGE',
               onAction: () {},
             ),
-
             const SizedBox(height: 24),
-
-            // Shipping Type
             _SectionTitle(title: 'Choose Shipping Type'),
             const SizedBox(height: 12),
             _InfoTile(
@@ -231,10 +255,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               actionLabel: 'CHANGE',
               onAction: _showShippingPicker,
             ),
-
             const SizedBox(height: 24),
-
-            // Order List
             _SectionTitle(title: 'Order List'),
             const SizedBox(height: 12),
             ...items.map((item) => Padding(
@@ -261,10 +282,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 style: GoogleFonts.montserrat(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600)),
-                            Text(
-                                item.produto is Buque
-                                    ? 'Bouquet'
-                                    : 'Bear',
+                            // C11: usa o getter categoria (POO)
+                            Text(item.produto.categoria,
                                 style: GoogleFonts.montserrat(
                                     fontSize: 12,
                                     color: Colors.grey.shade500)),
@@ -281,13 +300,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ],
                   ),
                 )),
-
             const SizedBox(height: 8),
             const Divider(),
             const SizedBox(height: 8),
-
-            _summaryRow('Sub-Total',
-                '\$${state.subTotal.toStringAsFixed(2)}'),
+            _summaryRow(
+                'Sub-Total', '\$${state.subTotal.toStringAsFixed(2)}'),
             _summaryRow('Shipping', shipping['price']!),
             _summaryRow('Tax', '\$${state.tax.toStringAsFixed(2)}'),
             if (state.discountValue > 0)
@@ -296,16 +313,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   '-\$${state.discountValue.toStringAsFixed(2)}',
                   valueColor: Colors.green),
             const Divider(),
-            _summaryRow(
-                'Total', '\$${state.totalCost.toStringAsFixed(2)}',
+            _summaryRow('Total', '\$${state.totalCost.toStringAsFixed(2)}',
                 isTotal: true),
-
             const SizedBox(height: 32),
-
             SizedBox(
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
+                // C7: _placeOrder agora é async e salva no SQLite
                 onPressed: () => _placeOrder(state),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF6500B2),
@@ -320,7 +335,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         fontSize: 16)),
               ),
             ),
-
             const SizedBox(height: 20),
           ],
         ),
@@ -340,7 +354,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   fontSize: isTotal ? 15 : 14,
                   fontWeight:
                       isTotal ? FontWeight.bold : FontWeight.w500,
-                  color: isTotal ? Colors.black : Colors.grey.shade600)),
+                  color:
+                      isTotal ? Colors.black : Colors.grey.shade600)),
           Text(value,
               style: GoogleFonts.montserrat(
                   fontSize: isTotal ? 16 : 14,

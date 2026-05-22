@@ -14,9 +14,12 @@ class CartItem {
 }
 
 // ---------------------------------------------------------------------------
-// AppState – InheritedWidget simples para compartilhar carrinho e wishlist
+// AppState – Gerenciador de Estado
 // ---------------------------------------------------------------------------
 class AppState extends ChangeNotifier {
+  // Lista central de produtos (substitui o uso direto de mockProdutos)
+  List<Produto> _produtos = [];
+  
   // Carrinho
   final List<CartItem> _cartItems = [];
   List<CartItem> get cartItems => List.unmodifiable(_cartItems);
@@ -27,6 +30,12 @@ class AppState extends ChangeNotifier {
   // Código promo aplicado
   String? _promoCode;
   double _discount = 0;
+
+  // Atualiza a lista de produtos vinda da API
+  void setProdutos(List<Produto> novosProdutos) {
+    _produtos = novosProdutos;
+    notifyListeners();
+  }
 
   // -------------------------------------------------------------------------
   // Carrinho
@@ -64,15 +73,12 @@ class AppState extends ChangeNotifier {
   }
 
   int get cartCount => _cartItems.fold(0, (sum, i) => sum + i.quantidade);
-
   double get subTotal => _cartItems.fold(0.0, (sum, i) => sum + i.subtotal);
   double get deliveryCharge => _cartItems.isEmpty ? 0 : 7.0;
   double get tax => subTotal * 0.03;
   double get discountValue => _discount;
   double get totalCost => subTotal + deliveryCharge + tax - _discount;
 
-  // Promo code
-  String? get appliedPromo => _promoCode;
   bool applyPromo(String code) {
     if (code.trim().toUpperCase() == 'GREENBELT10') {
       _promoCode = code;
@@ -97,12 +103,13 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Agora filtra com base na lista de produtos carregada da API
   List<Produto> get wishlistProdutos =>
-      mockProdutos.where((p) => _wishlistIds.contains(p.id)).toList();
+      _produtos.where((p) => _wishlistIds.contains(p.id)).toList();
 }
 
 // ---------------------------------------------------------------------------
-// Provider widget – envolve o MaterialApp
+// Provider widget
 // ---------------------------------------------------------------------------
 class AppStateProvider extends InheritedNotifier<AppState> {
   const AppStateProvider({

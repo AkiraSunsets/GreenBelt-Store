@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../models/app_state.dart';
 import 'checkout_screen.dart';
+import '../models/produto.dart'; // <--- Adicione esta linha
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});

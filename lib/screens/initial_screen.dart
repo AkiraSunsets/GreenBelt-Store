@@ -1,5 +1,10 @@
+// lib/screens/initial_screen.dart
+// C7: Verificação de sessão salva com SharedPreferences (auto-login)
+
 import 'package:flutter/material.dart';
+import 'package:greenbelt_flutter/screens/home_screen.dart';
 import 'package:greenbelt_flutter/screens/onboarding_screen.dart';
+import 'package:greenbelt_flutter/services/auth_service.dart';
 
 class StartApp extends StatefulWidget {
   const StartApp({super.key});
@@ -9,6 +14,24 @@ class StartApp extends StatefulWidget {
 }
 
 class _StartAppState extends State<StartApp> {
+  @override
+  void initState() {
+    super.initState();
+    // C7: Verifica sessão salva assim que o widget é criado
+    _verificarSessao();
+  }
+
+  // Se o usuário já estiver logado, vai direto para a HomeScreen
+  Future<void> _verificarSessao() async {
+    final logado = await AuthService.isLogado();
+    if (logado && mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

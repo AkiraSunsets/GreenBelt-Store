@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:greenbelt_flutter/screens/home_screen.dart';
+import 'package:greenbelt_flutter/services/auth_service.dart';
 
 import '../components/text_field.dart';
 import '../components/primary_button.dart';
@@ -82,9 +82,11 @@ class _TelaLoginWidgetState extends State<TelaLoginWidget> {
                 const SizedBox(height: 30),
                 PrimaryButton(
                   text: 'Sign In',
-                  onPressed: () {
-                    print('Email: ${_emailController.text}');
-                    print('Senha: ${_passwordController.text}');
+                  onPressed: () async {
+                    // Implementação da Persistência de Sessão (C7)
+                    await AuthService.salvarSessao(_emailController.text);
+                    
+                    if (!mounted) return;
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -102,29 +104,6 @@ class _TelaLoginWidgetState extends State<TelaLoginWidget> {
                     SocialIconButton(iconData: Icons.apple_sharp, onTap: () {}),
                     const SizedBox(width: 20),
                     SocialIconButton(iconData: Icons.apple_sharp, onTap: () {}),
-                  ],
-                ),
-                const SizedBox(height: 40),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Don\'t have an account?',
-                      style: GoogleFonts.montserrat(fontSize: 14, fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () => print('Sign Up Tapped'),
-                      child: Text(
-                        'Sign Up',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600, 
-                          color: const Color(0xFF6500B2),
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ],
