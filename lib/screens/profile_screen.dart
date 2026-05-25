@@ -2,12 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../screens/initial_screen.dart';
+import '../services/auth_service.dart';
 
 // ---------------------------------------------------------------------------
 // Tela de Perfil principal
 // ---------------------------------------------------------------------------
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+class ProfileScreen extends StatefulWidget {
+  /// Callback chamado quando o usuário salva um nome novo em EditProfileScreen
+  final VoidCallback? onNameUpdated;
+
+  const ProfileScreen({super.key, this.onNameUpdated});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String _userName = '';
+  String _userEmail = '';
 
   final List<Map<String, dynamic>> _menuItems = const [
     {'icon': Icons.person_outline, 'label': 'Your profile'},
@@ -19,6 +31,23 @@ class ProfileScreen extends StatelessWidget {
     {'icon': Icons.settings_outlined, 'label': 'Settings'},
     {'icon': Icons.help_outline, 'label': 'Help Center'},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarDados();
+  }
+
+  Future<void> _carregarDados() async {
+    final nome = await AuthService.getNome();
+    final email = await AuthService.getEmail();
+    if (mounted) {
+      setState(() {
+        _userName = nome;
+        _userEmail = email;
+      });
+    }
+  }
 
   void _confirmLogout(BuildContext context) {
     showModalBottomSheet(
@@ -66,12 +95,13 @@ class ProfileScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      await AuthService.logout();
+                      if (!context.mounted) return;
                       Navigator.of(context).popUntil((r) => r.isFirst);
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                            builder: (_) => const StartApp()),
+                        MaterialPageRoute(builder: (_) => const StartApp()),
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -103,10 +133,7 @@ class ProfileScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false,
         title: Text('Profile',
             style: GoogleFonts.montserrat(
                 fontSize: 18,
@@ -128,8 +155,8 @@ class ProfileScreen extends StatelessWidget {
                   height: 96,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(
-                        color: const Color(0xFF6500B2), width: 2.5),
+                    border:
+                        Border.all(color: const Color(0xFF6500B2), width: 2.5),
                   ),
                   child: ClipOval(
                     child: Image.network(
@@ -142,17 +169,27 @@ class ProfileScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(6),
                   decoration: const BoxDecoration(
                       color: Color(0xFF6500B2), shape: BoxShape.circle),
-                  child: const Icon(Icons.edit,
-                      size: 14, color: Colors.white),
+                  child: const Icon(Icons.edit, size: 14, color: Colors.white),
                 ),
               ],
             ),
 
             const SizedBox(height: 12),
 
-            Text('Esther Howard',
+            // Nome real do usuário
+            Text(
+              _userName.isEmpty ? '...' : _userName,
+              style: GoogleFonts.montserrat(
+                  fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+
+            // Email do usuário
+            if (_userEmail.isNotEmpty)
+              Text(
+                _userEmail,
                 style: GoogleFonts.montserrat(
-                    fontSize: 18, fontWeight: FontWeight.bold)),
+                    fontSize: 13, color: Colors.grey.shade500),
+              ),
 
             const SizedBox(height: 28),
 
@@ -167,8 +204,8 @@ class ProfileScreen extends StatelessWidget {
               itemBuilder: (context, i) {
                 final item = _menuItems[i];
                 return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 4, vertical: 4),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                   leading: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -183,15 +220,23 @@ class ProfileScreen extends StatelessWidget {
                     style: GoogleFonts.montserrat(
                         fontSize: 15, fontWeight: FontWeight.w500),
                   ),
-                  trailing: const Icon(Icons.chevron_right,
-                      color: Colors.grey),
-                  onTap: () {
+                  trailing:
+                      const Icon(Icons.chevron_right, color: Colors.grey),
+                  onTap: () async {
                     if (item['label'] == 'Your profile') {
-                      Navigator.push(
+                      final updated = await Navigator.push<bool>(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => const EditProfileScreen()),
+                          builder: (_) => EditProfileScreen(
+                            initialName: _userName,
+                            initialEmail: _userEmail,
+                          ),
+                        ),
                       );
+                      if (updated == true) {
+                        await _carregarDados();
+                        widget.onNameUpdated?.call();
+                      }
                     }
                   },
                 );
@@ -210,8 +255,8 @@ class ProfileScreen extends StatelessWidget {
                   color: Colors.red.shade50,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.logout,
-                    color: Colors.red, size: 20),
+                child:
+                    const Icon(Icons.logout, color: Colors.red, size: 20),
               ),
               title: Text('Logout',
                   style: GoogleFonts.montserrat(
@@ -233,20 +278,32 @@ class ProfileScreen extends StatelessWidget {
 // Tela de Edição de Perfil
 // ---------------------------------------------------------------------------
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
+  final String initialName;
+  final String initialEmail;
+
+  const EditProfileScreen({
+    super.key,
+    required this.initialName,
+    required this.initialEmail,
+  });
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  final _nameController =
-      TextEditingController(text: 'Esther Howard');
-  final _phoneController =
-      TextEditingController(text: '603.555.0123');
-  final _emailController =
-      TextEditingController(text: 'esther@example.com');
+  late final TextEditingController _nameController;
+  late final TextEditingController _emailController;
+  final _phoneController = TextEditingController(text: '');
   String? _selectedGender;
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.initialName);
+    _emailController = TextEditingController(text: widget.initialEmail);
+  }
 
   @override
   void dispose() {
@@ -254,6 +311,42 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _phoneController.dispose();
     _emailController.dispose();
     super.dispose();
+  }
+
+  Future<void> _salvar() async {
+    final novoNome = _nameController.text.trim();
+    if (novoNome.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Name cannot be empty.',
+              style: GoogleFonts.montserrat()),
+          backgroundColor: Colors.red.shade700,
+          behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isSaving = true);
+    await AuthService.atualizarNome(novoNome);
+    if (!mounted) return;
+    setState(() => _isSaving = false);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content:
+            Text('Profile updated!', style: GoogleFonts.montserrat()),
+        backgroundColor: const Color(0xFF6500B2),
+        behavior: SnackBarBehavior.floating,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+
+    // Retorna true para indicar que houve atualização
+    Navigator.pop(context, true);
   }
 
   @override
@@ -281,7 +374,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           child: Column(
             children: [
-              // Avatar
               Stack(
                 alignment: Alignment.bottomRight,
                 children: [
@@ -303,8 +395,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: const BoxDecoration(
-                        color: Color(0xFF6500B2),
-                        shape: BoxShape.circle),
+                        color: Color(0xFF6500B2), shape: BoxShape.circle),
                     child: const Icon(Icons.edit,
                         size: 14, color: Colors.white),
                   ),
@@ -313,7 +404,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               const SizedBox(height: 28),
 
-              // Name
               _EditField(label: 'Name', controller: _nameController),
               const SizedBox(height: 16),
 
@@ -342,22 +432,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 14),
                               border: InputBorder.none,
+                              hintText: '(00) 00000-0000',
                               hintStyle: GoogleFonts.montserrat(
                                   color: Colors.grey.shade400),
                             ),
                             style: GoogleFonts.montserrat(fontSize: 14),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 12),
-                          child: GestureDetector(
-                            onTap: () {},
-                            child: Text('Change',
-                                style: GoogleFonts.montserrat(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700,
-                                    color:
-                                        const Color(0xFF6500B2))),
                           ),
                         ),
                       ],
@@ -368,11 +447,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               const SizedBox(height: 16),
 
-              // Email
+              // Email (read-only — troca de email requer fluxo separado)
               _EditField(
-                  label: 'Email',
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress),
+                label: 'Email',
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                readOnly: true,
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Contact support to change your email.',
+                  style: GoogleFonts.montserrat(
+                      fontSize: 11, color: Colors.grey.shade400),
+                ),
+              ),
+
               const SizedBox(height: 16),
 
               // Gender
@@ -397,8 +487,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         isExpanded: true,
                         hint: Text('Select',
                             style: GoogleFonts.montserrat(
-                                color: Colors.grey.shade400,
-                                fontSize: 14)),
+                                color: Colors.grey.shade400, fontSize: 14)),
                         items: ['Male', 'Female', 'Other']
                             .map((g) => DropdownMenuItem(
                                 value: g,
@@ -424,30 +513,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Profile updated!',
-                            style: GoogleFonts.montserrat()),
-                        backgroundColor: const Color(0xFF6500B2),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                    );
-                    Navigator.pop(context);
-                  },
+                  onPressed: _isSaving ? null : _salvar,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6500B2),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50)),
                   ),
-                  child: Text('Update',
-                      style: GoogleFonts.montserrat(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16)),
+                  child: _isSaving
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text('Update',
+                          style: GoogleFonts.montserrat(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16)),
                 ),
               ),
 
@@ -464,11 +543,14 @@ class _EditField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final TextInputType keyboardType;
+  final bool readOnly;
 
-  const _EditField(
-      {required this.label,
-      required this.controller,
-      this.keyboardType = TextInputType.text});
+  const _EditField({
+    required this.label,
+    required this.controller,
+    this.keyboardType = TextInputType.text,
+    this.readOnly = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -484,9 +566,11 @@ class _EditField extends StatelessWidget {
         TextField(
           controller: controller,
           keyboardType: keyboardType,
+          readOnly: readOnly,
           decoration: InputDecoration(
             filled: true,
-            fillColor: Colors.grey.shade100,
+            fillColor:
+                readOnly ? Colors.grey.shade200 : Colors.grey.shade100,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(
@@ -494,7 +578,9 @@ class _EditField extends StatelessWidget {
               borderSide: BorderSide.none,
             ),
           ),
-          style: GoogleFonts.montserrat(fontSize: 14),
+          style: GoogleFonts.montserrat(
+              fontSize: 14,
+              color: readOnly ? Colors.grey.shade500 : Colors.black),
         ),
       ],
     );

@@ -6,6 +6,7 @@ import 'package:greenbelt_flutter/services/auth_service.dart';
 import '../components/text_field.dart';
 import '../components/primary_button.dart';
 import '../components/social_icon.dart';
+import 'register_screen.dart';
 
 class TelaLoginWidget extends StatefulWidget {
   const TelaLoginWidget({super.key});
@@ -17,12 +18,43 @@ class TelaLoginWidget extends StatefulWidget {
 class _TelaLoginWidgetState extends State<TelaLoginWidget> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleSignIn() async {
+    setState(() => _isLoading = true);
+
+    final erro = await AuthService.login(
+      email: _emailController.text.trim(),
+      senha: _passwordController.text,
+    );
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (erro != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(erro, style: GoogleFonts.montserrat()),
+          backgroundColor: Colors.red.shade700,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      );
+      return;
+    }
+
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
   }
 
   @override
@@ -67,12 +99,12 @@ class _TelaLoginWidgetState extends State<TelaLoginWidget> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
-                    onTap: () => print('Forget Password Tapped'),
+                    onTap: () {},
                     child: Text(
                       'Forget Password?',
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
-                        fontWeight: FontWeight.w600, 
+                        fontWeight: FontWeight.w600,
                         color: const Color(0xFF6500B2),
                         decoration: TextDecoration.underline,
                       ),
@@ -80,19 +112,39 @@ class _TelaLoginWidgetState extends State<TelaLoginWidget> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                PrimaryButton(
-                  text: 'Sign In',
-                  onPressed: () async {
-                    // Implementação da Persistência de Sessão (C7)
-                    await AuthService.salvarSessao(_emailController.text);
-                    
-                    if (!mounted) return;
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    );
-                  },
+                _isLoading
+                    ? const CircularProgressIndicator(color: Color(0xFF6500B2))
+                    : PrimaryButton(text: 'Sign In', onPressed: _handleSignIn),
+                const SizedBox(height: 24),
+
+                // Link para cadastro
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Don't have an account?",
+                      style: GoogleFonts.montserrat(
+                          fontSize: 14, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                      ),
+                      child: Text(
+                        'Sign Up',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF6500B2),
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+
                 const SizedBox(height: 40),
                 const SizedBox(width: 300, child: Divider(thickness: 1.5, color: Colors.black12)),
                 const SizedBox(height: 20),

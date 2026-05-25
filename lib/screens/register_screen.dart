@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// Importe os componentes que criamos anteriormente
 import '../components/text_field.dart';
 import '../components/primary_button.dart';
 import '../components/social_icon.dart';
+import '../services/auth_service.dart';
+import 'home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -15,10 +15,10 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  // Controladores para os campos de texto
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -26,6 +26,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleSignUp() async {
+    // Remove espaços extras
+    final nome = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final senha = _passwordController.text;
+
+    setState(() => _isLoading = true);
+
+    final erro = await AuthService.cadastrar(
+      nome: nome,
+      email: email,
+      senha: senha,
+    );
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (erro != null) {
+      // Mostra o erro em um SnackBar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(erro, style: GoogleFonts.montserrat()),
+          backgroundColor: Colors.red.shade700,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      );
+      return;
+    }
+
+    // Cadastro OK → faz login automático e vai para HomeScreen
+    await AuthService.salvarSessao(email.toLowerCase(), nome: nome);
+
+    if (!mounted) return;
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      (route) => false,
+    );
   }
 
   @override
@@ -36,133 +77,79 @@ class _RegisterScreenState extends State<RegisterScreen> {
         backgroundColor: Colors.white,
         body: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 30.0,
-              vertical: 40.0,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 40.0),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // --- Ícone do Topo ---
-                const Icon(
-                  Icons.spa_outlined,
-                  color: Color(0xFF881F72),
-                  size: 100,
-                ),
-
+                const Icon(Icons.spa_outlined, color: Color(0xFF881F72), size: 100),
                 const SizedBox(height: 30),
-
-                // --- Título e Subtítulo ---
                 Text(
                   'Create Account',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: GoogleFonts.montserrat(fontSize: 25, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Fill your information or register with your social account',
+                  'Fill your information or register\nwith your social account',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14,
-                    color: Colors.grey.shade700,
-                  ),
+                  style: GoogleFonts.montserrat(fontSize: 14, color: Colors.grey.shade700),
                 ),
-
                 const SizedBox(height: 40),
-
-                // --- Inputs usando nosso Componente ---
                 CustomTextField(
                   controller: _nameController,
                   label: 'Name',
                   hintText: 'Ex: Akira Sunsets',
                 ),
-
                 const SizedBox(height: 20),
-
                 CustomTextField(
                   controller: _emailController,
                   label: 'Email',
                   hintText: 'email@example.com',
                   keyboardType: TextInputType.emailAddress,
                 ),
-
                 const SizedBox(height: 20),
-
                 CustomTextField(
                   controller: _passwordController,
                   label: 'Password',
                   hintText: '********',
                   isPassword: true,
                 ),
-
-                const SizedBox(height: 40),
-
-                // --- Botão de Cadastro ---
-                PrimaryButton(
-                  text: 'Sign Up',
-                  onPressed: () {
-                    print('Name: ${_nameController.text}');
-                    print('Email: ${_emailController.text}');
-                    print('Password: ${_passwordController.text}');
-
-                    // Aqui entrará a lógica de salvar no banco/API futuramente
-                  },
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Minimum 6 characters',
+                    style: GoogleFonts.montserrat(fontSize: 12, color: Colors.grey.shade500),
+                  ),
                 ),
-
+                const SizedBox(height: 32),
+                _isLoading
+                    ? const CircularProgressIndicator(color: Color(0xFF881F72))
+                    : PrimaryButton(text: 'Sign Up', onPressed: _handleSignUp),
                 const SizedBox(height: 40),
-
-                // --- Divisor ---
-                const SizedBox(
-                  width: 300,
-                  child: Divider(thickness: 1.5, color: Colors.black12),
-                ),
-
+                const SizedBox(width: 300, child: Divider(thickness: 1.5, color: Colors.black12)),
                 const SizedBox(height: 20),
-
-                // --- Redes Sociais usando nosso Componente ---
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SocialIconButton(
-                      iconData: Icons.apple_sharp,
-                      onTap: () => print('Apple Login'),
-                    ),
+                    SocialIconButton(iconData: Icons.apple_sharp, onTap: () {}),
                     const SizedBox(width: 20),
-                    SocialIconButton(
-                      iconData: Icons.apple_sharp,
-                      onTap: () => print('Google Login'),
-                    ),
+                    SocialIconButton(iconData: Icons.apple_sharp, onTap: () {}),
                     const SizedBox(width: 20),
-                    SocialIconButton(
-                      iconData: Icons.apple_sharp,
-                      onTap: () => print('Facebook Login'),
-                    ),
+                    SocialIconButton(iconData: Icons.apple_sharp, onTap: () {}),
                   ],
                 ),
-
                 const SizedBox(height: 40),
-
-                // --- Link para Login ---
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       'Already have an account?',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: GoogleFonts.montserrat(fontSize: 14, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(width: 8),
                     GestureDetector(
-                      onTap: () {
-                        // Como a tela de login já deve estar na pilha de navegação,
-                        // usamos o pop para voltar a ela e economizar memória.
-                        Navigator.pop(context);
-                      },
+                      onTap: () => Navigator.pop(context),
                       child: Text(
                         'Sign In',
                         style: GoogleFonts.montserrat(

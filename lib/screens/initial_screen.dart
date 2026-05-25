@@ -1,10 +1,12 @@
 // lib/screens/initial_screen.dart
-// C7: Verificação de sessão salva com SharedPreferences (auto-login)
+// C7: Verificação de sessão salva — se logado, vai direto para Home
+// Também restaura o nome do usuário no AppState via SharedPreferences
 
 import 'package:flutter/material.dart';
 import 'package:greenbelt_flutter/screens/home_screen.dart';
 import 'package:greenbelt_flutter/screens/onboarding_screen.dart';
 import 'package:greenbelt_flutter/services/auth_service.dart';
+import 'package:greenbelt_flutter/models/app_state.dart';
 
 class StartApp extends StatefulWidget {
   const StartApp({super.key});
@@ -17,19 +19,26 @@ class _StartAppState extends State<StartApp> {
   @override
   void initState() {
     super.initState();
-    // C7: Verifica sessão salva assim que o widget é criado
     _verificarSessao();
   }
 
-  // Se o usuário já estiver logado, vai direto para a HomeScreen
   Future<void> _verificarSessao() async {
     final logado = await AuthService.isLogado();
-    if (logado && mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
-    }
+    if (!logado || !mounted) return;
+
+    // C7: Recupera os dados salvos localmente para restaurar o estado
+    final nome = await AuthService.getNome();
+    final email = await AuthService.getEmail();
+
+    if (!mounted) return;
+
+    // Injeta o nome e email no AppState para que todas as telas recebam
+    AppStateProvider.of(context).setUsuario(nome: nome, email: email);
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
   }
 
   @override
@@ -42,46 +51,35 @@ class _StartAppState extends State<StartApp> {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
-                Icons.spa_outlined,
-                color: Color(0xFF881F72),
-                size: 120,
-              ),
+              const Icon(Icons.spa_outlined,
+                  color: Color(0xFF881F72), size: 120),
               const SizedBox(height: 20),
               const Text(
-                "Greenbelt Store",
-                style: TextStyle(
-                  fontSize: 35,
-                  fontWeight: FontWeight.w600,
-                ),
+                'Greenbelt Store',
+                style: TextStyle(fontSize: 35, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 60),
               SizedBox(
                 width: 300,
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const TesteSplashScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const TesteSplashScreen()),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF881F72),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
+                        borderRadius: BorderRadius.circular(50)),
                   ),
                   child: const Text(
-                    "Get Started",
+                    'Get Started',
                     style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18),
                   ),
                 ),
               ),

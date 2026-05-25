@@ -1,3 +1,4 @@
+// lib/models/app_state.dart
 import 'package:flutter/material.dart';
 import 'produto.dart';
 
@@ -14,32 +15,50 @@ class CartItem {
 }
 
 // ---------------------------------------------------------------------------
-// AppState – Gerenciador de Estado
+// AppState – Gerenciador de Estado Global
 // ---------------------------------------------------------------------------
 class AppState extends ChangeNotifier {
-  // Lista central de produtos (substitui o uso direto de mockProdutos)
+  // Dados do usuário logado
+  String _nomeUsuario = '';
+  String _emailUsuario = '';
+
+  String get nomeUsuario => _nomeUsuario.isNotEmpty ? _nomeUsuario : 'Usuário';
+  String get emailUsuario => _emailUsuario;
+
+  // Primeira letra do nome, usada no avatar quando não há foto
+  String get inicialNome =>
+      _nomeUsuario.isNotEmpty ? _nomeUsuario[0].toUpperCase() : 'U';
+
+  // Atualiza os dados do usuário (chamado após login ou cadastro)
+  void setUsuario({required String nome, required String email}) {
+    _nomeUsuario = nome;
+    _emailUsuario = email;
+    notifyListeners();
+  }
+
+  // Limpa os dados ao fazer logout
+  void clearUsuario() {
+    _nomeUsuario = '';
+    _emailUsuario = '';
+    notifyListeners();
+  }
+
+  // -----------------------------------------------------------------------
+  // Lista central de produtos (vinda da API)
+  // -----------------------------------------------------------------------
   List<Produto> _produtos = [];
-  
-  // Carrinho
-  final List<CartItem> _cartItems = [];
-  List<CartItem> get cartItems => List.unmodifiable(_cartItems);
 
-  // Wishlist
-  final Set<String> _wishlistIds = {};
-
-  // Código promo aplicado
-  String? _promoCode;
-  double _discount = 0;
-
-  // Atualiza a lista de produtos vinda da API
   void setProdutos(List<Produto> novosProdutos) {
     _produtos = novosProdutos;
     notifyListeners();
   }
 
-  // -------------------------------------------------------------------------
+  // -----------------------------------------------------------------------
   // Carrinho
-  // -------------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  final List<CartItem> _cartItems = [];
+  List<CartItem> get cartItems => List.unmodifiable(_cartItems);
+
   void addToCart(Produto produto, {int quantidade = 1}) {
     final idx = _cartItems.indexWhere((i) => i.produto.id == produto.id);
     if (idx >= 0) {
@@ -59,9 +78,7 @@ class AppState extends ChangeNotifier {
     final idx = _cartItems.indexWhere((i) => i.produto.id == produtoId);
     if (idx < 0) return;
     _cartItems[idx].quantidade += delta;
-    if (_cartItems[idx].quantidade <= 0) {
-      _cartItems.removeAt(idx);
-    }
+    if (_cartItems[idx].quantidade <= 0) _cartItems.removeAt(idx);
     notifyListeners();
   }
 
@@ -79,6 +96,10 @@ class AppState extends ChangeNotifier {
   double get discountValue => _discount;
   double get totalCost => subTotal + deliveryCharge + tax - _discount;
 
+  String? _promoCode;
+  double _discount = 0;
+  String? get appliedPromo => _promoCode;
+
   bool applyPromo(String code) {
     if (code.trim().toUpperCase() == 'GREENBELT10') {
       _promoCode = code;
@@ -89,9 +110,11 @@ class AppState extends ChangeNotifier {
     return false;
   }
 
-  // -------------------------------------------------------------------------
+  // -----------------------------------------------------------------------
   // Wishlist
-  // -------------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  final Set<String> _wishlistIds = {};
+
   bool isWishlisted(String id) => _wishlistIds.contains(id);
 
   void toggleWishlist(Produto produto) {
@@ -103,13 +126,12 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Agora filtra com base na lista de produtos carregada da API
   List<Produto> get wishlistProdutos =>
       _produtos.where((p) => _wishlistIds.contains(p.id)).toList();
 }
 
 // ---------------------------------------------------------------------------
-// Provider widget
+// Provider widget – envolve o MaterialApp
 // ---------------------------------------------------------------------------
 class AppStateProvider extends InheritedNotifier<AppState> {
   const AppStateProvider({
