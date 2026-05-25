@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1",
+    "nome": "Buquê Clássico",
+    "preco": 89.90,
+    "categoria": "Buquês",
+    "imagePath": "assets/images/1.jpg",
+    "descricao": "Um lindo buquê de rosas selecionadas."
+  },
+  {
+    "id": "2",
+    "nome": "Urso de Pelúcia",
+    "preco": 45.00,
+    "categoria": "Pelúcias",
+    "imagePath": "assets/images/2.jpg",
+    "descricao": "Pelúcia macia e fofa para presentear."
+  }
+]

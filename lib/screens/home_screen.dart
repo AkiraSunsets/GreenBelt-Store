@@ -31,10 +31,10 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Produto> _produtos = [];
   bool _isLoading = true;
 
-  // Nome do usuário logado
+  //Username logado
   String _userName = '';
 
-  final List<String> _categories = ['All', 'Bouquets', 'Flowers', 'Bears'];
+  final List<String> _categories = ['Todos', 'Buquês', 'Flores', 'Pelúcias'];
 
   @override
   void initState() {
@@ -43,16 +43,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _carregarDados() async {
-    // Carrega nome e produtos em paralelo
-    final results = await Future.wait([
-      AuthService.getNome(),
-      ProdutoService.getProdutos().catchError((_) => mockProdutos),
-    ]);
+    final produtos = await ProdutoService.getProdutos();
 
     if (!mounted) return;
+
+    final nome = await AuthService.getNome();
+
     setState(() {
-      _userName = results[0] as String;
-      _produtos = results[1] as List<Produto>;
+      _userName = nome;
+      _produtos = produtos;
       _isLoading = false;
     });
   }
@@ -65,14 +64,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<Produto> get _filteredProdutos {
-    if (_selectedCategory == 'All') return _produtos;
-    if (_selectedCategory == 'Bears') {
+    if (_selectedCategory == 'Todos') return _produtos;
+    if (_selectedCategory == 'Pelúcias') {
       return _produtos.whereType<Pelucia>().toList();
     }
     return _produtos.whereType<Buque>().toList();
   }
 
-  // Chamado pela ProfileScreen quando o usuário atualiza o nome
+  //atualiza o nome
   void _recarregarNome() async {
     final nome = await AuthService.getNome();
     if (mounted) setState(() => _userName = nome);
@@ -290,6 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: const [
               BannerCard(assetPath: 'assets/images/1.jpg'),
               BannerCard(assetPath: 'assets/images/2.jpg'),
+              BannerCard(assetPath: 'assets/images/3.jpg'),
             ],
           ),
         ),

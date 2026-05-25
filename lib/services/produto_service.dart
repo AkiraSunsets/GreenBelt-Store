@@ -1,78 +1,74 @@
 // lib/services/produto_service.dart
-// C8: Integração com serviço web RESTful — GET, POST, PUT, DELETE
-
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import '../models/produto.dart';
 
 class ProdutoService {
-  // ⚠️  Substitua pela URL real do seu MockAPI ou backend
-  // Exemplo MockAPI: https://XXXXXXXX.mockapi.io/api/v1
-  static const String _baseUrl = 'https://SEU_MOCKAPI.mockapi.io/api/v1';
-
-  // Headers padrão para todas as requisições com corpo JSON
+  // Endereço do seu JSON Server
+  static const String _baseUrl = 'http://localhost:3000';
+  
   static const Map<String, String> _headers = {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json; charset=UTF-8',
   };
 
   // -----------------------------------------------------------------------
-  // GET /produtos — Busca a lista completa de produtos da API
-  // C8: Realizando comunicação GET
+  // GET /produtos — Tenta buscar da API, se falhar, usa o Mock
   // -----------------------------------------------------------------------
   static Future<List<Produto>> getProdutos() async {
-    final response = await http.get(
-      Uri.parse('$_baseUrl/produtos'),
-    );
+    try {
+      final response = await http.get(Uri.parse('$_baseUrl/produtos'));
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      // C11: usa o factory Produto.fromJson() para criar os objetos corretos
-      return data.map((json) => Produto.fromJson(json)).toList();
+      if (response.statusCode == 200) {
+        // Uso utf8.decode para garantir que acentos funcionem bem
+        final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
+        return data.map((json) => Produto.fromJson(json)).toList();
+      } else {
+        throw Exception('Erro na API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Erro ao conectar na API ($e). Usando dados locais.");
+      return getProdutosMock();
     }
+  }
 
-    // Fallback: retorna a lista mock se a API falhar
-    // Remova este fallback quando a API estiver configurada
-    return mockProdutos;
+  // Método auxiliar para ler o JSON local (seu plano B)
+  static Future<List<Produto>> getProdutosMock() async {
+    final String response = await rootBundle.loadString('assets/data/produtos.json');
+    final List<dynamic> data = json.decode(response);
+    return data.map((json) => Produto.fromJson(json)).toList();
   }
 
   // -----------------------------------------------------------------------
   // GET /produtos/:id — Busca um único produto pelo ID
-  // C8: Realizando comunicação GET
   // -----------------------------------------------------------------------
   static Future<Produto> getProdutoPorId(String id) async {
-    final response = await http.get(
-      Uri.parse('$_baseUrl/produtos/$id'),
-    );
+    final response = await http.get(Uri.parse('$_baseUrl/produtos/$id'));
 
     if (response.statusCode == 200) {
-      return Produto.fromJson(jsonDecode(response.body));
+      return Produto.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     }
-
     throw Exception('Produto não encontrado (status ${response.statusCode})');
   }
 
   // -----------------------------------------------------------------------
-  // POST /produtos — Cria um novo produto na API
-  // C8: Realizando comunicação POST
+  // POST /produtos — Cria um novo produto
   // -----------------------------------------------------------------------
   static Future<Produto> criarProduto(Produto produto) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/produtos'),
       headers: _headers,
-      // C11: usa o método toJson() da classe Produto para serializar
       body: jsonEncode(produto.toJson()),
     );
 
     if (response.statusCode == 201) {
-      return Produto.fromJson(jsonDecode(response.body));
+      return Produto.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     }
-
     throw Exception('Erro ao criar produto (status ${response.statusCode})');
   }
 
   // -----------------------------------------------------------------------
-  // PUT /produtos/:id — Atualiza um produto existente na API
-  // C8: Realizando comunicação PUT
+  // PUT /produtos/:id — Atualiza um produto existente
   // -----------------------------------------------------------------------
   static Future<Produto> atualizarProduto(String id, Produto produto) async {
     final response = await http.put(
@@ -82,15 +78,13 @@ class ProdutoService {
     );
 
     if (response.statusCode == 200) {
-      return Produto.fromJson(jsonDecode(response.body));
+      return Produto.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     }
-
     throw Exception('Erro ao atualizar produto (status ${response.statusCode})');
   }
 
   // -----------------------------------------------------------------------
-  // DELETE /produtos/:id — Remove um produto da API
-  // C8: Realizando comunicação DELETE
+  // DELETE /produtos/:id — Remove um produto
   // -----------------------------------------------------------------------
   static Future<void> deletarProduto(String id) async {
     final response = await http.delete(

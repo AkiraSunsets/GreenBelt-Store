@@ -1,0 +1,18 @@
+{
+  "produtos": [
+    {
+      "id": "1",
+      "nome": "Buquê Clássico",
+      "preco": 89.90,
+      "categoria": "Bouquets",
+      "imagePath": "https://images.unsplash.com/photo-1597733153203-a54d0fbc00de?w=800&q=80"
+    },
+    {
+      "id": "2",
+      "nome": "Urso de Pelúcia",
+      "preco": 45.00,
+      "categoria": "Bears",
+      "imagePath": "https://images.unsplash.com/photo-1558291993-37651a80509a?w=800&q=80"
+    }
+  ]
+}

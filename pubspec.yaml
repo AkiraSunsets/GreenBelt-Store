@@ -68,6 +68,8 @@ flutter:
     - assets/images/1.jpg
     - assets/images/2.jpg
     - assets/images/3.jpg
+    - assets/data/produtos.json
+    - assets/data/db.json
 
 
 
