@@ -90,3 +90,18 @@ class UsuarioService {
     throw Exception('Erro ao atualizar perfil (status ${response.statusCode})');
   }
 }
+
+class CurrencyService {
+  static Future<double> getUsdRate() async {
+    try {
+      final response = await http.get(Uri.parse('https://economia.awesomeapi.com.br/last/USD-BRL'));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return double.parse(data['USDBRL']['bid']);
+      }
+    } catch (e) {
+      return 5.0; // Fallback
+    }
+    return 5.0;
+  }
+}

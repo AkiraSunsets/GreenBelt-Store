@@ -39,22 +39,26 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _carregarDados();
+    _carregarProdutos();
   }
 
-  Future<void> _carregarDados() async {
-    final produtos = await ProdutoService.getProdutos();
-
+Future<void> _carregarProdutos() async {
+  try {
+    final lista = await ProdutoService.getProdutos();
     if (!mounted) return;
-
-    final nome = await AuthService.getNome();
-
+    
+    // Atualiza o estado global para que wishlist/carrinho saibam dos produtos
+    AppStateProvider.of(context).setProdutos(lista);
+    
     setState(() {
-      _userName = nome;
-      _produtos = produtos;
+      _produtos = lista;
       _isLoading = false;
     });
+  } catch (e) {
+    setState(() => _isLoading = false);
+    // Erro silencioso ou SnackBar
   }
+}
 
   @override
   void dispose() {

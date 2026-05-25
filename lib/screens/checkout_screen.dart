@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/app_state.dart';
 import '../models/produto.dart';
 import '../services/database_service.dart';
+import '../services/export_service.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -41,7 +42,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (_) => StatefulBuilder(
         builder: (ctx, setBS) => Padding(
           padding: const EdgeInsets.all(24),
@@ -60,9 +62,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              Text('Choose Shipping Type',
-                  style: GoogleFonts.montserrat(
-                      fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(
+                'Choose Shipping Type',
+                style: GoogleFonts.montserrat(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 16),
               ..._shippingOptions.entries.map((e) {
                 final selected = _shippingType == e.key;
@@ -70,8 +76,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   onTap: () {
                     setState(() => _shippingType = e.key);
                     setBS(() {});
-                    Future.delayed(const Duration(milliseconds: 200),
-                        () => Navigator.pop(ctx));
+                    Future.delayed(
+                      const Duration(milliseconds: 200),
+                      () => Navigator.pop(ctx),
+                    );
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
@@ -90,30 +98,41 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.local_shipping_outlined,
-                            color: selected
-                                ? const Color(0xFF881F72)
-                                : Colors.grey),
+                        Icon(
+                          Icons.local_shipping_outlined,
+                          color: selected
+                              ? const Color(0xFF881F72)
+                              : Colors.grey,
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(e.value['label']!,
-                                  style: GoogleFonts.montserrat(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 14)),
-                              Text(e.value['eta']!,
-                                  style: GoogleFonts.montserrat(
-                                      fontSize: 12,
-                                      color: Colors.grey.shade500)),
+                              Text(
+                                e.value['label']!,
+                                style: GoogleFonts.montserrat(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Text(
+                                e.value['eta']!,
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
                             ],
                           ),
                         ),
-                        Text(e.value['price']!,
-                            style: GoogleFonts.montserrat(
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF881F72))),
+                        Text(
+                          e.value['price']!,
+                          style: GoogleFonts.montserrat(
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF881F72),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -128,24 +147,48 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   // C7: Salva o pedido no SQLite antes de limpar o carrinho
-  Future<void> _placeOrder(AppState state) async {
-    // Monta a lista de itens para salvar no banco
+ Future<void> _placeOrder(AppState state) async {
+    // 1. Defina os itens ANTES de tudo para usar em ambos os serviços
     final itens = state.cartItems
         .map((i) => {
               'nome': i.produto.nome,
-              'categoria': i.produto.categoria, // C11: usa o getter da POO
+              'categoria': i.produto.categoria,
               'quantidade': i.quantidade,
               'precoUnit': i.produto.preco,
               'subtotal': i.subtotal,
             })
         .toList();
 
-    // C7: Persiste o pedido localmente no SQLite
+    // 2. Tenta enviar para API (C8)
+    try {
+      final pedido = {
+        "total": state.totalCost,
+        "itens": itens,
+        "frete": _shippingType,
+        "data": DateTime.now().toIso8601String(),
+      };
+      print("Pedido enviado para a API: $pedido"); 
+      // await ProdutoService.criarPedido(pedido); // Descomente quando integrar
+    } catch (e) {
+      print("Erro ao sincronizar com API: $e");
+    }
+
+    // 3. Persistência Interna (SQLite) - C7
     await DatabaseService.salvarPedido(
       total: state.totalCost,
       frete: _shippingType,
       itens: itens,
     );
+
+    // 4. Persistência Externa (Arquivo .txt) - C7
+    try {
+      final conteudo = "Pedido: ${DateTime.now()}\nTotal: ${state.totalCost}\nItens: $itens";
+      // Certifique-se de ter criado o ExportService que te passei antes
+      await ExportService.exportarPedidoParaArquivo(conteudo);
+      print("Arquivo salvo no armazenamento externo!");
+    } catch (e) {
+      print("Erro ao salvar arquivo externo: $e");
+    }
 
     state.clearCart();
 
@@ -155,8 +198,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       context: context,
       barrierDismissible: false,
       builder: (_) => Dialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(
@@ -168,19 +210,28 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   color: Color(0xFFF3E5FF),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.check,
-                    color: Color(0xFF881F72), size: 40),
+                child: const Icon(
+                  Icons.check,
+                  color: Color(0xFF881F72),
+                  size: 40,
+                ),
               ),
               const SizedBox(height: 20),
-              Text('Order Placed!',
-                  style: GoogleFonts.montserrat(
-                      fontSize: 20, fontWeight: FontWeight.bold)),
+              Text(
+                'Order Placed!',
+                style: GoogleFonts.montserrat(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 8),
               Text(
                 'Your order has been confirmed and will be delivered soon.',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.montserrat(
-                    fontSize: 14, color: Colors.grey.shade600),
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                ),
               ),
               const SizedBox(height: 24),
               SizedBox(
@@ -193,13 +244,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     backgroundColor: const Color(0xFF881F72),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50)),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
-                  child: Text('Back to Home',
-                      style: GoogleFonts.montserrat(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700)),
+                  child: Text(
+                    'Back to Home',
+                    style: GoogleFonts.montserrat(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -224,11 +279,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Checkout',
-            style: GoogleFonts.montserrat(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black)),
+        title: Text(
+          'Checkout',
+          style: GoogleFonts.montserrat(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -258,63 +316,77 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             const SizedBox(height: 24),
             _SectionTitle(title: 'Order List'),
             const SizedBox(height: 12),
-            ...items.map((item) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: SizedBox(
-                          width: 56,
-                          height: 56,
-                          child: Image.network(item.produto.imagemUrl,
-                              fit: BoxFit.cover),
+            ...items.map(
+              (item) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: SizedBox(
+                        width: 56,
+                        height: 56,
+                        child: Image.network(
+                          item.produto.imagemUrl,
+                          fit: BoxFit.cover,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(item.produto.nome,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.montserrat(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600)),
-                            // C11: usa o getter categoria (POO)
-                            Text(item.produto.categoria,
-                                style: GoogleFonts.montserrat(
-                                    fontSize: 12,
-                                    color: Colors.grey.shade500)),
-                          ],
-                        ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.produto.nome,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          // C11: usa o getter categoria (POO)
+                          Text(
+                            item.produto.categoria,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 12,
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '\$${item.subtotal.toStringAsFixed(2)}',
-                        style: GoogleFonts.montserrat(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF881F72)),
+                    ),
+                    Text(
+                      '\$${item.subtotal.toStringAsFixed(2)}',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF881F72),
                       ),
-                    ],
-                  ),
-                )),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 8),
             const Divider(),
             const SizedBox(height: 8),
-            _summaryRow(
-                'Sub-Total', '\$${state.subTotal.toStringAsFixed(2)}'),
+            _summaryRow('Sub-Total', '\$${state.subTotal.toStringAsFixed(2)}'),
             _summaryRow('Shipping', shipping['price']!),
             _summaryRow('Tax', '\$${state.tax.toStringAsFixed(2)}'),
             if (state.discountValue > 0)
               _summaryRow(
-                  'Discount',
-                  '-\$${state.discountValue.toStringAsFixed(2)}',
-                  valueColor: Colors.green),
+                'Discount',
+                '-\$${state.discountValue.toStringAsFixed(2)}',
+                valueColor: Colors.green,
+              ),
             const Divider(),
-            _summaryRow('Total', '\$${state.totalCost.toStringAsFixed(2)}',
-                isTotal: true),
+            _summaryRow(
+              'Total',
+              '\$${state.totalCost.toStringAsFixed(2)}',
+              isTotal: true,
+            ),
             const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
@@ -326,13 +398,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   backgroundColor: const Color(0xFF881F72),
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50)),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
                 ),
-                child: Text('Continue to Payment',
-                    style: GoogleFonts.montserrat(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16)),
+                child: Text(
+                  'Continue to Payment',
+                  style: GoogleFonts.montserrat(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -342,29 +418,35 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _summaryRow(String label, String value,
-      {bool isTotal = false, Color? valueColor}) {
+  Widget _summaryRow(
+    String label,
+    String value, {
+    bool isTotal = false,
+    Color? valueColor,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label,
-              style: GoogleFonts.montserrat(
-                  fontSize: isTotal ? 15 : 14,
-                  fontWeight:
-                      isTotal ? FontWeight.bold : FontWeight.w500,
-                  color:
-                      isTotal ? Colors.black : Colors.grey.shade600)),
-          Text(value,
-              style: GoogleFonts.montserrat(
-                  fontSize: isTotal ? 16 : 14,
-                  fontWeight:
-                      isTotal ? FontWeight.bold : FontWeight.w600,
-                  color: valueColor ??
-                      (isTotal
-                          ? const Color(0xFF881F72)
-                          : Colors.black))),
+          Text(
+            label,
+            style: GoogleFonts.montserrat(
+              fontSize: isTotal ? 15 : 14,
+              fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
+              color: isTotal ? Colors.black : Colors.grey.shade600,
+            ),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.montserrat(
+              fontSize: isTotal ? 16 : 14,
+              fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
+              color:
+                  valueColor ??
+                  (isTotal ? const Color(0xFF881F72) : Colors.black),
+            ),
+          ),
         ],
       ),
     );
@@ -376,10 +458,13 @@ class _SectionTitle extends StatelessWidget {
   const _SectionTitle({required this.title});
   @override
   Widget build(BuildContext context) => Text(
-        title,
-        style: GoogleFonts.montserrat(
-            fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
-      );
+    title,
+    style: GoogleFonts.montserrat(
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+      color: Colors.black,
+    ),
+  );
 }
 
 class _InfoTile extends StatelessWidget {
@@ -389,12 +474,13 @@ class _InfoTile extends StatelessWidget {
   final String actionLabel;
   final VoidCallback onAction;
 
-  const _InfoTile(
-      {required this.icon,
-      required this.title,
-      required this.subtitle,
-      required this.actionLabel,
-      required this.onAction});
+  const _InfoTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.actionLabel,
+    required this.onAction,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -413,22 +499,33 @@ class _InfoTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: GoogleFonts.montserrat(
-                        fontSize: 14, fontWeight: FontWeight.w700)),
-                Text(subtitle,
-                    style: GoogleFonts.montserrat(
-                        fontSize: 12, color: Colors.grey.shade500)),
+                Text(
+                  title,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 12,
+                    color: Colors.grey.shade500,
+                  ),
+                ),
               ],
             ),
           ),
           GestureDetector(
             onTap: onAction,
-            child: Text(actionLabel,
-                style: GoogleFonts.montserrat(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF881F72))),
+            child: Text(
+              actionLabel,
+              style: GoogleFonts.montserrat(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF881F72),
+              ),
+            ),
           ),
         ],
       ),

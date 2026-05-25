@@ -2,17 +2,13 @@
   "produtos": [
     {
       "id": "1",
-      "nome": "Buquê Clássico",
-      "preco": 89.90,
-      "categoria": "Bouquets",
-      "imagePath": "https://images.unsplash.com/photo-1597733153203-a54d0fbc00de?w=800&q=80"
-    },
-    {
-      "id": "2",
-      "nome": "Urso de Pelúcia",
-      "preco": 45.00,
-      "categoria": "Bears",
-      "imagePath": "https://images.unsplash.com/photo-1558291993-37651a80509a?w=800&q=80"
+      "nome": "Purple Passion Bouquet",
+      "preco": 80.0,
+      "imagemUrl": "https://png.pngtree.com/png-clipart/20250119/original/pngtree-valentines-day-red-and-pink-roses-bouquet-png-image_20303425.png",
+      "avaliacao": 5.0,
+      "totalReviews": 25,
+      "categoria": "Buque",
+      "tipoFlor": "Rosas e Lírios"
     }
   ]
 }
