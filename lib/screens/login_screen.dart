@@ -70,7 +70,7 @@ class _TelaLoginWidgetState extends State<TelaLoginWidget> {
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Icon(Icons.spa_outlined, color: Color(0xFF6500B2), size: 100),
+                const Icon(Icons.spa_outlined, color: Color(0xFF881F72), size: 100),
                 const SizedBox(height: 30),
                 Text(
                   'Sign In',
@@ -105,7 +105,7 @@ class _TelaLoginWidgetState extends State<TelaLoginWidget> {
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF6500B2),
+                        color: const Color(0xFF881F72),
                         decoration: TextDecoration.underline,
                       ),
                     ),
@@ -113,7 +113,7 @@ class _TelaLoginWidgetState extends State<TelaLoginWidget> {
                 ),
                 const SizedBox(height: 30),
                 _isLoading
-                    ? const CircularProgressIndicator(color: Color(0xFF6500B2))
+                    ? const CircularProgressIndicator(color: Color(0xFF881F72))
                     : PrimaryButton(text: 'Sign In', onPressed: _handleSignIn),
                 const SizedBox(height: 24),
 
@@ -137,7 +137,7 @@ class _TelaLoginWidgetState extends State<TelaLoginWidget> {
                         style: GoogleFonts.montserrat(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF6500B2),
+                          color: const Color(0xFF881F72),
                           decoration: TextDecoration.underline,
                         ),
                       ),

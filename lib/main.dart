@@ -19,10 +19,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Envolvemos o MaterialApp com o AppStateProvider para 
-    // disponibilizar o estado global em toda a árvore de widgets.
     return AppStateProvider(
-      state: AppState(), // Instanciamos o estado aqui no topo
+      state: AppState(), 
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(

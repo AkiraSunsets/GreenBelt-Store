@@ -84,7 +84,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: selected
-                            ? const Color(0xFF6500B2)
+                            ? const Color(0xFF881F72)
                             : Colors.grey.shade200,
                       ),
                     ),
@@ -92,7 +92,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       children: [
                         Icon(Icons.local_shipping_outlined,
                             color: selected
-                                ? const Color(0xFF6500B2)
+                                ? const Color(0xFF881F72)
                                 : Colors.grey),
                         const SizedBox(width: 12),
                         Expanded(
@@ -113,7 +113,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         Text(e.value['price']!,
                             style: GoogleFonts.montserrat(
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xFF6500B2))),
+                                color: const Color(0xFF881F72))),
                       ],
                     ),
                   ),
@@ -169,7 +169,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.check,
-                    color: Color(0xFF6500B2), size: 40),
+                    color: Color(0xFF881F72), size: 40),
               ),
               const SizedBox(height: 20),
               Text('Order Placed!',
@@ -190,7 +190,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     Navigator.of(context).popUntil((r) => r.isFirst);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6500B2),
+                    backgroundColor: const Color(0xFF881F72),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50)),
@@ -295,7 +295,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         style: GoogleFonts.montserrat(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF6500B2)),
+                            color: const Color(0xFF881F72)),
                       ),
                     ],
                   ),
@@ -323,7 +323,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 // C7: _placeOrder agora é async e salva no SQLite
                 onPressed: () => _placeOrder(state),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6500B2),
+                  backgroundColor: const Color(0xFF881F72),
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50)),
@@ -363,7 +363,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       isTotal ? FontWeight.bold : FontWeight.w600,
                   color: valueColor ??
                       (isTotal
-                          ? const Color(0xFF6500B2)
+                          ? const Color(0xFF881F72)
                           : Colors.black))),
         ],
       ),
@@ -428,7 +428,7 @@ class _InfoTile extends StatelessWidget {
                 style: GoogleFonts.montserrat(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF6500B2))),
+                    color: const Color(0xFF881F72))),
           ),
         ],
       ),

@@ -25,7 +25,7 @@ class SocialIconButton extends StatelessWidget {
         ),
         child: Icon(
           iconData,
-          color: const Color(0xFF6500B2),
+          color: const Color(0xFF881F72),
           size: 30,
         ),
       ),

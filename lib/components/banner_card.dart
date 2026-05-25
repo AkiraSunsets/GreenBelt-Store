@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class BannerCard extends StatelessWidget {
-  final String imageUrl;
+  final String assetPath;
 
   const BannerCard({
     super.key,
-    required this.imageUrl,
+    required this.assetPath,
   });
 
   @override
@@ -14,8 +14,8 @@ class BannerCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: Image.network(
-          imageUrl,
+        child: Image.asset(
+          assetPath,
           fit: BoxFit.cover,
           width: double.infinity,
         ),

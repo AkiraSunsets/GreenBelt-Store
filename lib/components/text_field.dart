@@ -41,7 +41,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           style: GoogleFonts.montserrat(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF6500B2),
+            color: const Color(0xFF881F72),
           ),
         ),
         const SizedBox(height: 10),

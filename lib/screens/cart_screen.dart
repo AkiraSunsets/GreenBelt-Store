@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../models/app_state.dart';
 import 'checkout_screen.dart';
-import '../models/produto.dart'; // <--- Adicione esta linha
+import '../models/produto.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -69,14 +69,14 @@ class _CartScreenState extends State<CartScreen> {
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context, false),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFF6500B2)),
+                      side: const BorderSide(color: Color(0xFF881F72)),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                     child: Text('Cancel',
                         style: GoogleFonts.montserrat(
-                            color: const Color(0xFF6500B2),
+                            color: const Color(0xFF881F72),
                             fontWeight: FontWeight.w600)),
                   ),
                 ),
@@ -85,7 +85,7 @@ class _CartScreenState extends State<CartScreen> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context, true),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6500B2),
+                      backgroundColor: const Color(0xFF881F72),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -127,7 +127,7 @@ class _CartScreenState extends State<CartScreen> {
                 fontWeight:
                     isTotal ? FontWeight.bold : FontWeight.w600,
                 color: valueColor ??
-                    (isTotal ? const Color(0xFF6500B2) : Colors.black)),
+                    (isTotal ? const Color(0xFF881F72) : Colors.black)),
           ),
         ],
       ),
@@ -246,7 +246,7 @@ class _CartScreenState extends State<CartScreen> {
                           ElevatedButton(
                             onPressed: () => _applyPromo(state),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6500B2),
+                              backgroundColor: const Color(0xFF881F72),
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12)),
@@ -296,7 +296,7 @@ class _CartScreenState extends State<CartScreen> {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6500B2),
+                            backgroundColor: const Color(0xFF881F72),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(50)),
@@ -455,14 +455,14 @@ class _CounterBtn extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: color == const Color(0xFF6500B2)
-              ? const Color(0xFF6500B2)
+          color: color == const Color(0xFF881F72)
+              ? const Color(0xFF881F72)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon,
             size: 16,
-            color: color == const Color(0xFF6500B2)
+            color: color == const Color(0xFF881F72)
                 ? Colors.white
                 : color),
       ),
