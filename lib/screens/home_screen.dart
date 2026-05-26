@@ -136,7 +136,7 @@ Future<void> _carregarProdutos() async {
             ),
             const BottomNavigationBarItem(
               icon: Icon(Icons.storefront_outlined, size: 26),
-              label: 'Explore',
+              label: 'Produtos',
             ),
             BottomNavigationBarItem(
               icon: Stack(
@@ -157,7 +157,7 @@ Future<void> _carregarProdutos() async {
                     ),
                 ],
               ),
-              label: 'Wishlist',
+              label: 'Favoritos',
             ),
             BottomNavigationBarItem(
               icon: Stack(
@@ -185,11 +185,11 @@ Future<void> _carregarProdutos() async {
                     ),
                 ],
               ),
-              label: 'Cart',
+              label: 'Carrinho',
             ),
             const BottomNavigationBarItem(
               icon: Icon(Icons.person_outline, size: 26),
-              label: 'Profile',
+              label: 'Perfil',
             ),
           ],
         ),

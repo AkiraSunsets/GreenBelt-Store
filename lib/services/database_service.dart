@@ -1,17 +1,18 @@
 // lib/services/database_service.dart
 // C7: Persistência de dados no banco de dados interno (SQLite)
+// Atualizado com suporte condicional para Web (kIsWeb)
 
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb; 
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseService {
   static Database? _database;
 
-  // -----------------------------------------------------------------------
   // Singleton — garante uma única instância do banco em todo o app
-  // -----------------------------------------------------------------------
-  static Future<Database> get database async {
+  static Future<Database?> get database async {
+    if (kIsWeb) return null; // Proteção para Web
     _database ??= await _initDatabase();
     return _database!;
   }
@@ -22,7 +23,6 @@ class DatabaseService {
       path,
       version: 1,
       onCreate: (db, version) async {
-        // C7: Criação da tabela de pedidos no armazenamento interno
         await db.execute('''
           CREATE TABLE pedidos (
             id        INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,39 +36,40 @@ class DatabaseService {
     );
   }
 
-  // -----------------------------------------------------------------------
-  // INSERT — salva o pedido finalizado localmente
-  // Chamado em checkout_screen.dart ao confirmar o pagamento
-  // -----------------------------------------------------------------------
+  // INSERT — salva o pedido
   static Future<int> salvarPedido({
     required double total,
     required String frete,
     required List<Map<String, dynamic>> itens,
   }) async {
+    if (kIsWeb) {
+      print("Modo Web: Simulando salvamento de pedido no banco.");
+      return 1; // Retorno fake para não quebrar o fluxo
+    }
+
     final db = await database;
-    return db.insert('pedidos', {
+    return db!.insert('pedidos', {
       'data': DateTime.now().toIso8601String(),
       'total': total,
       'frete': frete,
-      'itensJson': jsonEncode(itens), // lista de itens serializada como texto
+      'itensJson': jsonEncode(itens),
     });
   }
 
-  // -----------------------------------------------------------------------
-  // SELECT ALL — retorna todos os pedidos do histórico
-  // Usado na tela "My Orders" do perfil
-  // -----------------------------------------------------------------------
+  // SELECT ALL — retorna todos os pedidos
   static Future<List<Map<String, dynamic>>> buscarPedidos() async {
+    if (kIsWeb) return []; // Retorna lista vazia na Web
+
     final db = await database;
-    return db.query('pedidos', orderBy: 'data DESC');
+    return db!.query('pedidos', orderBy: 'data DESC');
   }
 
-  // -----------------------------------------------------------------------
-  // SELECT ONE — retorna um pedido específico pelo id
-  // -----------------------------------------------------------------------
+  // SELECT ONE — retorna um pedido específico
   static Future<Map<String, dynamic>?> buscarPedidoPorId(int id) async {
+    if (kIsWeb) return null; // Retorna nulo na Web
+
     final db = await database;
-    final result = await db.query(
+    final result = await db!.query(
       'pedidos',
       where: 'id = ?',
       whereArgs: [id],
@@ -77,19 +78,19 @@ class DatabaseService {
     return result.isNotEmpty ? result.first : null;
   }
 
-  // -----------------------------------------------------------------------
-  // DELETE — remove um pedido do histórico local
-  // -----------------------------------------------------------------------
+  // DELETE — remove um pedido
   static Future<void> deletarPedido(int id) async {
+    if (kIsWeb) return; // Nada a deletar na Web
+
     final db = await database;
-    await db.delete('pedidos', where: 'id = ?', whereArgs: [id]);
+    await db!.delete('pedidos', where: 'id = ?', whereArgs: [id]);
   }
 
-  // -----------------------------------------------------------------------
-  // DELETE ALL — limpa todo o histórico (útil ao fazer logout)
-  // -----------------------------------------------------------------------
+  // DELETE ALL — limpa histórico
   static Future<void> limparHistorico() async {
+    if (kIsWeb) return; // Nada a limpar na Web
+
     final db = await database;
-    await db.delete('pedidos');
+    await db!.delete('pedidos');
   }
 }

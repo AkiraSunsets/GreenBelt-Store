@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:greenbelt_flutter/screens/initial_screen.dart';
-import 'package:greenbelt_flutter/screens/onboarding_screen.dart';
-import 'package:greenbelt_flutter/screens/start_screen.dart';
-import 'package:greenbelt_flutter/screens/login_screen.dart';
-import 'package:greenbelt_flutter/screens/register_screen.dart';
-import 'package:greenbelt_flutter/screens/product_details_screen.dart';
 import 'package:greenbelt_flutter/models/app_state.dart';
+import 'package:greenbelt_flutter/screens/initial_screen.dart';
 
-import 'package:greenbelt_flutter/screens/home_screen.dart';
+void main() async {
+  // Garante que o Flutter esteja inicializado
+  WidgetsFlutterBinding.ensureInitialized();
 
-void main() {
+  // REMOVEMOS AQUI AS CHAMADAS DE FFI QUE ESTAVAM CAUSANDO ERROS
+  
   runApp(const MyApp());
 }
 
@@ -20,12 +18,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppStateProvider(
-      state: AppState(), 
+      state: AppState(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           textTheme: GoogleFonts.montserratTextTheme(),
-          primaryTextTheme: GoogleFonts.montserratTextTheme(),
         ),
         home: const StartApp(),
       ),

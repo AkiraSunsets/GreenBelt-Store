@@ -1,7 +1,3 @@
-// lib/screens/checkout_screen.dart
-// C7: Persistência de pedido no banco de dados interno (SQLite)
-// C8: Integração com API (estrutura preparada para POST do pedido)
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -9,6 +5,9 @@ import '../models/app_state.dart';
 import '../models/produto.dart';
 import '../services/database_service.dart';
 import '../services/export_service.dart';
+import '../services/produto_service.dart';
+import '../components/primary_button.dart';
+import 'payment_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -146,124 +145,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  // C7: Salva o pedido no SQLite antes de limpar o carrinho
- Future<void> _placeOrder(AppState state) async {
-    // 1. Defina os itens ANTES de tudo para usar em ambos os serviços
-    final itens = state.cartItems
-        .map((i) => {
-              'nome': i.produto.nome,
-              'categoria': i.produto.categoria,
-              'quantidade': i.quantidade,
-              'precoUnit': i.produto.preco,
-              'subtotal': i.subtotal,
-            })
-        .toList();
-
-    // 2. Tenta enviar para API (C8)
-    try {
-      final pedido = {
-        "total": state.totalCost,
-        "itens": itens,
-        "frete": _shippingType,
-        "data": DateTime.now().toIso8601String(),
-      };
-      print("Pedido enviado para a API: $pedido"); 
-      // await ProdutoService.criarPedido(pedido); // Descomente quando integrar
-    } catch (e) {
-      print("Erro ao sincronizar com API: $e");
-    }
-
-    // 3. Persistência Interna (SQLite) - C7
-    await DatabaseService.salvarPedido(
-      total: state.totalCost,
-      frete: _shippingType,
-      itens: itens,
-    );
-
-    // 4. Persistência Externa (Arquivo .txt) - C7
-    try {
-      final conteudo = "Pedido: ${DateTime.now()}\nTotal: ${state.totalCost}\nItens: $itens";
-      // Certifique-se de ter criado o ExportService que te passei antes
-      await ExportService.exportarPedidoParaArquivo(conteudo);
-      print("Arquivo salvo no armazenamento externo!");
-    } catch (e) {
-      print("Erro ao salvar arquivo externo: $e");
-    }
-
-    state.clearCart();
-
-    if (!mounted) return;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF3E5FF),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.check,
-                  color: Color(0xFF881F72),
-                  size: 40,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Order Placed!',
-                style: GoogleFonts.montserrat(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Your order has been confirmed and will be delivered soon.',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).popUntil((r) => r.isFirst);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF881F72),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  child: Text(
-                    'Back to Home',
-                    style: GoogleFonts.montserrat(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = AppStateProvider.of(context);
@@ -294,7 +175,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _SectionTitle(title: 'Shipping Address'),
+            const _SectionTitle(title: 'Shipping Address'),
             const SizedBox(height: 12),
             _InfoTile(
               icon: Icons.location_on_outlined,
@@ -304,7 +185,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               onAction: () {},
             ),
             const SizedBox(height: 24),
-            _SectionTitle(title: 'Choose Shipping Type'),
+            const _SectionTitle(title: 'Choose Shipping Type'),
             const SizedBox(height: 12),
             _InfoTile(
               icon: Icons.local_shipping_outlined,
@@ -314,7 +195,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               onAction: _showShippingPicker,
             ),
             const SizedBox(height: 24),
-            _SectionTitle(title: 'Order List'),
+            const _SectionTitle(title: 'Order List'),
             const SizedBox(height: 12),
             ...items.map(
               (item) => Padding(
@@ -346,7 +227,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          // C11: usa o getter categoria (POO)
                           Text(
                             item.produto.categoria,
                             style: GoogleFonts.montserrat(
@@ -392,8 +272,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                // C7: _placeOrder agora é async e salva no SQLite
-                onPressed: () => _placeOrder(state),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PaymentScreen(
+                        total: state.totalCost,
+                        frete: shipping['label']!,
+                        endereco: '1901 Thornridge Cir. Shiloh, Hawaii 81063',
+                      ),
+                    ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF881F72),
                   elevation: 0,

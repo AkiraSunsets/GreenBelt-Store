@@ -45,6 +45,7 @@ dependencies:
   sqflite: ^2.3.3
   path: ^1.9.0
   path_provider: ^2.1.0
+  sqflite_common_ffi: ^2.3.3
 
 dev_dependencies:
   flutter_test:
@@ -69,7 +70,7 @@ flutter:
     - assets/images/2.jpg
     - assets/images/3.jpg
     - assets/data/produtos.json
-    - assets/data/db.json
+    - db.json
 
 
 
