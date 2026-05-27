@@ -1,4 +1,3 @@
-// lib/services/produto_service.dart
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -12,9 +11,7 @@ class ProdutoService {
     'Content-Type': 'application/json; charset=UTF-8',
   };
 
-  // -----------------------------------------------------------------------
   // GET /produtos — Tenta buscar da API, se falhar, usa o Mock
-  // -----------------------------------------------------------------------
   static Future<List<Produto>> getProdutos() async {
     try {
       final response = await http.get(Uri.parse('$_baseUrl/produtos'));
@@ -32,16 +29,14 @@ class ProdutoService {
     }
   }
 
-  // Método auxiliar para ler o JSON local (seu plano B)
+  // Método auxiliar para ler o JSON local 
   static Future<List<Produto>> getProdutosMock() async {
     final String response = await rootBundle.loadString('assets/data/produtos.json');
     final List<dynamic> data = json.decode(response);
     return data.map((json) => Produto.fromJson(json)).toList();
   }
 
-  // -----------------------------------------------------------------------
   // GET /produtos/:id — Busca um único produto pelo ID
-  // -----------------------------------------------------------------------
   static Future<Produto> getProdutoPorId(String id) async {
     final response = await http.get(Uri.parse('$_baseUrl/produtos/$id'));
 
@@ -51,9 +46,7 @@ class ProdutoService {
     throw Exception('Produto não encontrado (status ${response.statusCode})');
   }
 
-  // -----------------------------------------------------------------------
   // POST /produtos — Cria um novo produto
-  // -----------------------------------------------------------------------
   static Future<Produto> criarProduto(Produto produto) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/produtos'),
@@ -67,9 +60,8 @@ class ProdutoService {
     throw Exception('Erro ao criar produto (status ${response.statusCode})');
   }
 
-  // -----------------------------------------------------------------------
+
   // PUT /produtos/:id — Atualiza um produto existente
-  // -----------------------------------------------------------------------
   static Future<Produto> atualizarProduto(String id, Produto produto) async {
     final response = await http.put(
       Uri.parse('$_baseUrl/produtos/$id'),
@@ -83,9 +75,7 @@ class ProdutoService {
     throw Exception('Erro ao atualizar produto (status ${response.statusCode})');
   }
 
-  // -----------------------------------------------------------------------
   // DELETE /produtos/:id — Remove um produto
-  // -----------------------------------------------------------------------
   static Future<void> deletarProduto(String id) async {
     final response = await http.delete(
       Uri.parse('$_baseUrl/produtos/$id'),

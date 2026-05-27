@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 class ExportService {
-  // [C7] Persistência em armazenamento externo
+
   static Future<String> exportarPedidoParaArquivo(String conteudoPedido) async {
     try {
       final directory = await getExternalStorageDirectory();

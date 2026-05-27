@@ -1,22 +1,21 @@
-// lib/services/usuario_service.dart
-// C8: POST de cadastro e GET de login via API RESTful
+
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class UsuarioService {
-  // ⚠️  Use a MESMA base URL do produto_service.dart
-  static const String _baseUrl = 'https://SEU_MOCKAPI.mockapi.io/api/v1';
+
+   static const String _baseUrl = 'http://192.168.15.170:3000';
 
   static const Map<String, String> _headers = {
     'Content-Type': 'application/json',
   };
 
-  // -----------------------------------------------------------------------
+
   // POST /usuarios — Cadastra um novo usuário na API
-  // C8: Realizando comunicação POST
+  // Realizando comunicação POST
   // Retorna o objeto criado com o id gerado pelo servidor
-  // -----------------------------------------------------------------------
+
   static Future<Map<String, dynamic>> registrar({
     required String nome,
     required String email,
@@ -28,9 +27,6 @@ class UsuarioService {
       body: jsonEncode({
         'nome': nome,
         'email': email,
-        // ⚠️  Nunca envie senha em texto puro para uma API real.
-        // Em produção use hashing (bcrypt) no backend ou Firebase Auth.
-        // Para este projeto de demonstração, enviamos apenas para fins didáticos.
         'senha': senha,
       }),
     );
@@ -42,11 +38,10 @@ class UsuarioService {
     throw Exception('Erro no cadastro (status ${response.statusCode})');
   }
 
-  // -----------------------------------------------------------------------
   // GET /usuarios?email=X — Busca usuário pelo email para simular login
   // C8: Realizando comunicação GET com query param
   // MockAPI suporta filtro por campo: /usuarios?email=teste@email.com
-  // -----------------------------------------------------------------------
+
   static Future<Map<String, dynamic>?> buscarPorEmail(String email) async {
     final uri = Uri.parse('$_baseUrl/usuarios').replace(
       queryParameters: {'email': email},
@@ -65,10 +60,8 @@ class UsuarioService {
     throw Exception('Erro ao buscar usuário (status ${response.statusCode})');
   }
 
-  // -----------------------------------------------------------------------
+
   // PUT /usuarios/:id — Atualiza dados do perfil na API
-  // C8: Realizando comunicação PUT
-  // -----------------------------------------------------------------------
   static Future<Map<String, dynamic>> atualizarPerfil({
     required String id,
     required String nome,
@@ -91,17 +84,3 @@ class UsuarioService {
   }
 }
 
-class CurrencyService {
-  static Future<double> getUsdRate() async {
-    try {
-      final response = await http.get(Uri.parse('https://economia.awesomeapi.com.br/last/USD-BRL'));
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return double.parse(data['USDBRL']['bid']);
-      }
-    } catch (e) {
-      return 5.0; // Fallback
-    }
-    return 5.0;
-  }
-}

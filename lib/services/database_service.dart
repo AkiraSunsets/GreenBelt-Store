@@ -1,7 +1,4 @@
-// lib/services/database_service.dart
-// C7: Persistência de dados no banco de dados interno (SQLite)
-// Atualizado com suporte condicional para Web (kIsWeb)
-
+//persistencia de dados no banco interno com sqlite
 import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb; 
 import 'package:sqflite/sqflite.dart';
@@ -44,7 +41,7 @@ class DatabaseService {
   }) async {
     if (kIsWeb) {
       print("Modo Web: Simulando salvamento de pedido no banco.");
-      return 1; // Retorno fake para não quebrar o fluxo
+      return 1; 
     }
 
     final db = await database;

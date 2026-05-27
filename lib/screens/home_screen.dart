@@ -240,6 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildProductGrid() => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 20.0),
     child: GridView.builder(
+      key: ValueKey(_selectedCategory),
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

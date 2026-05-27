@@ -97,7 +97,7 @@ class AuthService {
 
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_keyLoggedIn, false); // Define como falso em vez de remover
+    await prefs.setBool(_keyLoggedIn, false); //definido como falso pq n há login
     await prefs.remove(_keyUserEmail);
     await prefs.remove(_keyUserName);
   }
