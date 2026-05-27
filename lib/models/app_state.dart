@@ -2,9 +2,6 @@
 import 'package:flutter/material.dart';
 import 'produto.dart';
 
-// ---------------------------------------------------------------------------
-// CartItem – agrupa Produto + quantidade
-// ---------------------------------------------------------------------------
 class CartItem {
   final Produto produto;
   int quantidade;
@@ -14,48 +11,34 @@ class CartItem {
   double get subtotal => produto.preco * quantidade;
 }
 
-// ---------------------------------------------------------------------------
-// AppState – Gerenciador de Estado Global
-// ---------------------------------------------------------------------------
 class AppState extends ChangeNotifier {
-  // Dados do usuário logado
+  // Dados do usuário
   String _nomeUsuario = '';
   String _emailUsuario = '';
 
   String get nomeUsuario => _nomeUsuario.isNotEmpty ? _nomeUsuario : 'Usuário';
   String get emailUsuario => _emailUsuario;
 
-  // Primeira letra do nome, usada no avatar quando não há foto
-  String get inicialNome =>
-      _nomeUsuario.isNotEmpty ? _nomeUsuario[0].toUpperCase() : 'U';
-
-  // Atualiza os dados do usuário (chamado após login ou cadastro)
   void setUsuario({required String nome, required String email}) {
     _nomeUsuario = nome;
     _emailUsuario = email;
     notifyListeners();
   }
 
-  // Limpa os dados ao fazer logout
   void clearUsuario() {
     _nomeUsuario = '';
     _emailUsuario = '';
     notifyListeners();
   }
 
-  // -----------------------------------------------------------------------
-  // Lista central de produtos (vinda da API)
-  // -----------------------------------------------------------------------
+  // Lista central de produtos
   List<Produto> _produtos = [];
-
   void setProdutos(List<Produto> novosProdutos) {
     _produtos = novosProdutos;
     notifyListeners();
   }
 
-  // -----------------------------------------------------------------------
   // Carrinho
-  // -----------------------------------------------------------------------
   final List<CartItem> _cartItems = [];
   List<CartItem> get cartItems => List.unmodifiable(_cartItems);
 
@@ -89,13 +72,25 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Cálculos Financeiros (Logica Unificada)
   int get cartCount => _cartItems.fold(0, (sum, i) => sum + i.quantidade);
   double get subTotal => _cartItems.fold(0.0, (sum, i) => sum + i.subtotal);
-  double get deliveryCharge => _cartItems.isEmpty ? 0 : 7.0;
+  
+  // Frete Dinâmico (Unificado)
+  double get deliveryCharge {
+    if (_cartItems.isEmpty) return 0.0;
+    if (subTotal >= 200) return 0.0; // Frete grátis acima de 200
+    if (subTotal >= 100) return 10.0; // Taxa reduzida
+    return 20.0; // Taxa padrão
+  }
+
   double get tax => subTotal * 0.03;
   double get discountValue => _discount;
+  
+  // Total Geral
   double get totalCost => subTotal + deliveryCharge + tax - _discount;
 
+  // Cupom
   String? _promoCode;
   double _discount = 0;
   String? get appliedPromo => _promoCode;
@@ -110,11 +105,8 @@ class AppState extends ChangeNotifier {
     return false;
   }
 
-  // -----------------------------------------------------------------------
   // Wishlist
-  // -----------------------------------------------------------------------
   final Set<String> _wishlistIds = {};
-
   bool isWishlisted(String id) => _wishlistIds.contains(id);
 
   void toggleWishlist(Produto produto) {
@@ -130,9 +122,6 @@ class AppState extends ChangeNotifier {
       _produtos.where((p) => _wishlistIds.contains(p.id)).toList();
 }
 
-// ---------------------------------------------------------------------------
-// Provider widget – envolve o MaterialApp
-// ---------------------------------------------------------------------------
 class AppStateProvider extends InheritedNotifier<AppState> {
   const AppStateProvider({
     super.key,

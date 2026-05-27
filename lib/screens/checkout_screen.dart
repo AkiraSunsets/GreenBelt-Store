@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../models/app_state.dart';
-import '../models/produto.dart';
-import '../services/database_service.dart';
-import '../services/export_service.dart';
-import '../services/produto_service.dart';
-import '../components/primary_button.dart';
 import 'payment_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -17,139 +12,10 @@ class CheckoutScreen extends StatefulWidget {
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
-  String _shippingType = 'Economy';
-
-  final Map<String, Map<String, String>> _shippingOptions = {
-    'Economy': {
-      'label': 'Economy',
-      'eta': 'Estimated Arrival 5–7 business days',
-      'price': '\$7.00',
-    },
-    'Express': {
-      'label': 'Express',
-      'eta': 'Estimated Arrival 1–2 business days',
-      'price': '\$15.00',
-    },
-    'Same Day': {
-      'label': 'Same Day',
-      'eta': 'Delivery today by 9 PM',
-      'price': '\$25.00',
-    },
-  };
-
-  void _showShippingPicker() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) => StatefulBuilder(
-        builder: (ctx, setBS) => Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Choose Shipping Type',
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              ..._shippingOptions.entries.map((e) {
-                final selected = _shippingType == e.key;
-                return GestureDetector(
-                  onTap: () {
-                    setState(() => _shippingType = e.key);
-                    setBS(() {});
-                    Future.delayed(
-                      const Duration(milliseconds: 200),
-                      () => Navigator.pop(ctx),
-                    );
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: selected
-                          ? const Color(0xFFF3E5FF)
-                          : Colors.grey.shade50,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: selected
-                            ? const Color(0xFF881F72)
-                            : Colors.grey.shade200,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.local_shipping_outlined,
-                          color: selected
-                              ? const Color(0xFF881F72)
-                              : Colors.grey,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                e.value['label']!,
-                                style: GoogleFonts.montserrat(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              Text(
-                                e.value['eta']!,
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 12,
-                                  color: Colors.grey.shade500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text(
-                          e.value['price']!,
-                          style: GoogleFonts.montserrat(
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF881F72),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }),
-              const SizedBox(height: 8),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = AppStateProvider.of(context);
     final items = state.cartItems;
-    final shipping = _shippingOptions[_shippingType]!;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -175,27 +41,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _SectionTitle(title: 'Shipping Address'),
+            const _SectionTitle(title: 'Endereço de Entrega'),
             const SizedBox(height: 12),
             _InfoTile(
               icon: Icons.location_on_outlined,
-              title: 'Home',
-              subtitle: '1901 Thornridge Cir. Shiloh, Hawaii 81063',
-              actionLabel: 'CHANGE',
-              onAction: () {},
+              title: 'Minha Casa',
+              subtitle: 'Rua das Flores, 1901 - Sumaré, SP',
             ),
             const SizedBox(height: 24),
-            const _SectionTitle(title: 'Choose Shipping Type'),
-            const SizedBox(height: 12),
-            _InfoTile(
-              icon: Icons.local_shipping_outlined,
-              title: shipping['label']!,
-              subtitle: shipping['eta']!,
-              actionLabel: 'CHANGE',
-              onAction: _showShippingPicker,
-            ),
-            const SizedBox(height: 24),
-            const _SectionTitle(title: 'Order List'),
+            const _SectionTitle(title: 'Resumo do Pedido'),
             const SizedBox(height: 12),
             ...items.map(
               (item) => Padding(
@@ -238,7 +92,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
                     ),
                     Text(
-                      '\$${item.subtotal.toStringAsFixed(2)}',
+                      'R\$ ${item.subtotal.toStringAsFixed(2).replaceAll('.', ',')}',
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -249,22 +103,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
             const Divider(),
-            const SizedBox(height: 8),
-            _summaryRow('Sub-Total', '\$${state.subTotal.toStringAsFixed(2)}'),
-            _summaryRow('Shipping', shipping['price']!),
-            _summaryRow('Tax', '\$${state.tax.toStringAsFixed(2)}'),
+            _summaryRow(
+              'Sub-Total',
+              'R\$ ${state.subTotal.toStringAsFixed(2).replaceAll('.', ',')}',
+            ),
+            _summaryRow(
+              'Frete',
+              'R\$ ${state.deliveryCharge.toStringAsFixed(2).replaceAll('.', ',')}',
+            ),
+            _summaryRow(
+              'Impostos',
+              'R\$ ${state.tax.toStringAsFixed(2).replaceAll('.', ',')}',
+            ),
             if (state.discountValue > 0)
               _summaryRow(
-                'Discount',
-                '-\$${state.discountValue.toStringAsFixed(2)}',
+                'Desconto',
+                '-R\$ ${state.discountValue.toStringAsFixed(2).replaceAll('.', ',')}',
                 valueColor: Colors.green,
               ),
             const Divider(),
             _summaryRow(
               'Total',
-              '\$${state.totalCost.toStringAsFixed(2)}',
+              'R\$ ${state.totalCost.toStringAsFixed(2).replaceAll('.', ',')}',
               isTotal: true,
             ),
             const SizedBox(height: 32),
@@ -272,18 +133,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => PaymentScreen(
-                        total: state.totalCost,
-                        frete: shipping['label']!,
-                        endereco: '1901 Thornridge Cir. Shiloh, Hawaii 81063',
-                      ),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PaymentScreen(
+                      total: state.totalCost,
+                      frete: 'R\$ ${state.deliveryCharge.toStringAsFixed(2)}',
+                      endereco: 'Rua das Flores, 1901',
                     ),
-                  );
-                },
+                  ),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF881F72),
                   elevation: 0,
@@ -292,7 +151,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ),
                 ),
                 child: Text(
-                  'Continue to Payment',
+                  'Finalizar Pagamento',
                   style: GoogleFonts.montserrat(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
@@ -301,7 +160,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -359,17 +217,11 @@ class _SectionTitle extends StatelessWidget {
 
 class _InfoTile extends StatelessWidget {
   final IconData icon;
-  final String title;
-  final String subtitle;
-  final String actionLabel;
-  final VoidCallback onAction;
-
+  final String title, subtitle;
   const _InfoTile({
     required this.icon,
     required this.title,
     required this.subtitle,
-    required this.actionLabel,
-    required this.onAction,
   });
 
   @override
@@ -383,7 +235,7 @@ class _InfoTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF6500B2), size: 22),
+          Icon(icon, color: const Color(0xFF881F72), size: 22),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -404,17 +256,6 @@ class _InfoTile extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-          ),
-          GestureDetector(
-            onTap: onAction,
-            child: Text(
-              actionLabel,
-              style: GoogleFonts.montserrat(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF881F72),
-              ),
             ),
           ),
         ],

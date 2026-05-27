@@ -6,7 +6,7 @@ import '../models/produto.dart';
 
 class ProdutoService {
   // Endereço do seu JSON Server
-  static const String _baseUrl = 'http://localhost:3000';
+  static const String _baseUrl = 'http://192.168.15.170:3000';
   
   static const Map<String, String> _headers = {
     'Content-Type': 'application/json; charset=UTF-8',

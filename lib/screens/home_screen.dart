@@ -1,15 +1,14 @@
-// lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:greenbelt_flutter/services/produto_service.dart';
 import 'package:greenbelt_flutter/services/auth_service.dart';
 
 import '../models/produto.dart';
 import '../models/app_state.dart';
 import '../components/product_card.dart';
-import '../components/banner_card.dart';
 import '../components/category_button.dart';
+import '../components/banner_carousel.dart';
+import '../components/nav_bar_bottom.dart';
 import 'product_details_screen.dart';
 import 'wishlist_screen.dart';
 import 'cart_screen.dart';
@@ -24,14 +23,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final PageController _pageController = PageController();
   int _currentIndex = 0;
-  String _selectedCategory = 'All';
+  String _selectedCategory = 'Todos';
 
   List<Produto> _produtos = [];
   bool _isLoading = true;
-
-  //Username logado
   String _userName = '';
 
   final List<String> _categories = ['Todos', 'Buquês', 'Flores', 'Pelúcias'];
@@ -40,45 +36,40 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _carregarProdutos();
+    _recarregarNome();
   }
 
-Future<void> _carregarProdutos() async {
-  try {
-    final lista = await ProdutoService.getProdutos();
-    if (!mounted) return;
-    
-    // Atualiza o estado global para que wishlist/carrinho saibam dos produtos
-    AppStateProvider.of(context).setProdutos(lista);
-    
-    setState(() {
-      _produtos = lista;
-      _isLoading = false;
-    });
-  } catch (e) {
-    setState(() => _isLoading = false);
-    // Erro silencioso ou SnackBar
+  Future<void> _carregarProdutos() async {
+    try {
+      final lista = await ProdutoService.getProdutos();
+      if (!mounted) return;
+      AppStateProvider.of(context).setProdutos(lista);
+      setState(() {
+        _produtos = lista;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+    }
   }
-}
+
+  // Filtro Dinâmico: Compara a categoria do produto com a selecionada
+  List<Produto> get _filteredProdutos {
+    if (_selectedCategory == 'Todos') return _produtos;
+    return _produtos.where((p) => p.categoria == _selectedCategory).toList();
+  }
+
+  void _recarregarNome() async {
+    final nome = await AuthService.getNome();
+    if (mounted) {
+      setState(() => _userName = nome.isNotEmpty ? nome : 'Visitante');
+    }
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
-    _pageController.dispose();
     super.dispose();
-  }
-
-  List<Produto> get _filteredProdutos {
-    if (_selectedCategory == 'Todos') return _produtos;
-    if (_selectedCategory == 'Pelúcias') {
-      return _produtos.whereType<Pelucia>().toList();
-    }
-    return _produtos.whereType<Buque>().toList();
-  }
-
-  //atualiza o nome
-  void _recarregarNome() async {
-    final nome = await AuthService.getNome();
-    if (mounted) setState(() => _userName = nome);
   }
 
   @override
@@ -89,10 +80,17 @@ Future<void> _carregarProdutos() async {
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: Colors.white,
-        bottomNavigationBar: _buildNavBar(state),
+        bottomNavigationBar: CustomBottomNavBar(
+          currentIndex: _currentIndex,
+          onTap: (i) => setState(() => _currentIndex = i),
+          cartCount: state.cartCount,
+          hasWishlistItems: state.wishlistProdutos.isNotEmpty,
+        ),
         body: SafeArea(
           child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(
+                  child: CircularProgressIndicator(color: Color(0xFF881F72)),
+                )
               : IndexedStack(
                   index: _currentIndex,
                   children: [
@@ -108,106 +106,17 @@ Future<void> _carregarProdutos() async {
     );
   }
 
-  Widget _buildNavBar(AppState state) {
-    return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Colors.pink.shade50.withOpacity(0.5),
-            spreadRadius: 5,
-            blurRadius: 10,
-            offset: const Offset(0, -3),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (i) => setState(() => _currentIndex = i),
-          backgroundColor: Colors.white,
-          selectedItemColor: const Color(0xFF881F72),
-          unselectedItemColor: Colors.grey.shade400,
-          type: BottomNavigationBarType.fixed,
-          items: [
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.home, size: 26),
-              label: 'Home',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.storefront_outlined, size: 26),
-              label: 'Produtos',
-            ),
-            BottomNavigationBarItem(
-              icon: Stack(
-                children: [
-                  const Icon(Icons.favorite_border, size: 26),
-                  if (state.wishlistProdutos.isNotEmpty)
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              label: 'Favoritos',
-            ),
-            BottomNavigationBarItem(
-              icon: Stack(
-                children: [
-                  const Icon(Icons.shopping_cart_outlined, size: 26),
-                  if (state.cartCount > 0)
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF881F72),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          '${state.cartCount}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              label: 'Carrinho',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline, size: 26),
-              label: 'Perfil',
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _homeBody(AppState state) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(state),
+          _buildHeader(),
           const SizedBox(height: 20),
           _buildSearchBar(),
           const SizedBox(height: 24),
-          _buildCarousel(),
+          const BannerCarousel(),
           const SizedBox(height: 28),
           _buildCategoryHeader(),
           const SizedBox(height: 12),
@@ -216,7 +125,7 @@ Future<void> _carregarProdutos() async {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Text(
-              'Featured',
+              'Destaques',
               style: GoogleFonts.montserrat(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -224,13 +133,13 @@ Future<void> _carregarProdutos() async {
             ),
           ),
           const SizedBox(height: 14),
-          _buildProductGrid(state),
+          _buildProductGrid(),
         ],
       ),
     );
   }
 
-  Widget _buildHeader(AppState state) => Padding(
+  Widget _buildHeader() => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 20.0),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -239,15 +148,14 @@ Future<void> _carregarProdutos() async {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Welcome back! ',
+              'Bem-vindo de volta!',
               style: GoogleFonts.montserrat(
                 fontSize: 13,
                 color: Colors.grey.shade500,
               ),
             ),
-            // Exibe o nome real do usuário logado
             Text(
-              _userName.isEmpty ? 'Loading...' : _userName,
+              _userName.isEmpty ? 'Carregando...' : _userName,
               style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -271,7 +179,7 @@ Future<void> _carregarProdutos() async {
     child: TextFormField(
       controller: _searchController,
       decoration: InputDecoration(
-        hintText: 'Search for flowers...',
+        hintText: 'Buscar flores ou pelúcias...',
         prefixIcon: const Icon(Icons.search),
         filled: true,
         fillColor: Colors.grey.shade100,
@@ -283,41 +191,13 @@ Future<void> _carregarProdutos() async {
     ),
   );
 
-  Widget _buildCarousel() => SizedBox(
-    height: 170,
-    child: Column(
-      children: [
-        Expanded(
-          child: PageView(
-            controller: _pageController,
-            children: const [
-              BannerCard(assetPath: 'assets/images/1.jpg'),
-              BannerCard(assetPath: 'assets/images/2.jpg'),
-              BannerCard(assetPath: 'assets/images/3.jpg'),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-        SmoothPageIndicator(
-          controller: _pageController,
-          count: 2,
-          effect: const SlideEffect(
-            dotWidth: 8,
-            dotHeight: 8,
-            activeDotColor: Color(0xFF881F72),
-          ),
-        ),
-      ],
-    ),
-  );
-
   Widget _buildCategoryHeader() => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 20.0),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'Categories',
+          'Categorias',
           style: GoogleFonts.montserrat(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -326,7 +206,7 @@ Future<void> _carregarProdutos() async {
         GestureDetector(
           onTap: () => setState(() => _currentIndex = 1),
           child: Text(
-            'See All',
+            'Ver Tudo',
             style: GoogleFonts.montserrat(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -357,7 +237,7 @@ Future<void> _carregarProdutos() async {
     ),
   );
 
-  Widget _buildProductGrid(AppState state) => Padding(
+  Widget _buildProductGrid() => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 20.0),
     child: GridView.builder(
       physics: const NeverScrollableScrollPhysics(),
@@ -392,23 +272,19 @@ Future<void> _carregarProdutos() async {
           child: Row(
             children: [
               Text(
-                'Explore',
+                'Explorar',
                 style: GoogleFonts.montserrat(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.tune_outlined),
-                onPressed: () {},
-              ),
             ],
           ),
         ),
         _buildCategoryList(),
         const SizedBox(height: 16),
-        Expanded(child: _buildProductGrid(state)),
+        Expanded(child: _buildProductGrid()),
       ],
     );
   }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../models/produto.dart';
@@ -10,10 +9,7 @@ import 'cart_screen.dart';
 class ProductDetailsScreen extends StatefulWidget {
   final Produto produto;
 
-  const ProductDetailsScreen({
-    super.key,
-    required this.produto,
-  });
+  const ProductDetailsScreen({super.key, required this.produto});
 
   @override
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
@@ -30,8 +26,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   void _incrementar() => setState(() => _quantidade++);
-  void _decrementar() =>
-      setState(() { if (_quantidade > 1) _quantidade--; });
+  void _decrementar() => setState(() {
+    if (_quantidade > 1) _quantidade--;
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -50,14 +47,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 children: [
                   PageView(
                     controller: _pageController,
-                    children: [
-                      Image.network(widget.produto.imagemUrl,
-                          fit: BoxFit.cover, width: double.infinity),
-                      Image.network(widget.produto.imagemUrl,
-                          fit: BoxFit.cover, width: double.infinity),
-                      Image.network(widget.produto.imagemUrl,
-                          fit: BoxFit.cover, width: double.infinity),
-                    ],
+                    children: List.generate(
+                      3,
+                      (_) => Image.network(
+                        widget.produto.imagemUrl,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
+                    ),
                   ),
                   Align(
                     alignment: Alignment.bottomCenter,
@@ -72,25 +69,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           dotWidth: 8,
                           dotHeight: 8,
                           dotColor: Color(0x80FFFFFF),
-                          activeDotColor: Color(0xFF6500B2),
+                          activeDotColor: Color(0xFF881F72),
                         ),
                       ),
                     ),
                   ),
-                  // Botão Voltar
                   Positioned(
                     top: 50,
                     left: 20,
                     child: CircleAvatar(
                       backgroundColor: Colors.white,
                       child: IconButton(
-                        icon: const Icon(Icons.arrow_back,
-                            color: Color(0xFF6500B2)),
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: Color(0xFF881F72),
+                        ),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
                   ),
-                  // Botões Favoritar e Compartilhar
                   Positioned(
                     top: 50,
                     right: 20,
@@ -100,63 +97,24 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           backgroundColor: Colors.white,
                           child: IconButton(
                             icon: Icon(
-                              isWished
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
+                              isWished ? Icons.favorite : Icons.favorite_border,
                               color: isWished
                                   ? Colors.red
-                                  : const Color(0xFF6500B2),
+                                  : const Color(0xFF881F72),
                             ),
                             onPressed: () =>
                                 state.toggleWishlist(widget.produto),
                           ),
                         ),
                         const SizedBox(width: 10),
-                        CircleAvatar(
+                        const CircleAvatar(
                           backgroundColor: Colors.white,
-                          child: IconButton(
-                            icon: const Icon(Icons.share_outlined,
-                                color: Color(0xFF6500B2)),
-                            onPressed: () {},
+                          child: Icon(
+                            Icons.share_outlined,
+                            color: Color(0xFF881F72),
                           ),
                         ),
                       ],
-                    ),
-                  ),
-                  // Badge carrinho
-                  Positioned(
-                    top: 50,
-                    right: 120,
-                    child: GestureDetector(
-                      onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const CartScreen())),
-                      child: Stack(
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.white,
-                            child: const Icon(Icons.shopping_cart_outlined,
-                                color: Color(0xFF6500B2)),
-                          ),
-                          if (state.cartCount > 0)
-                            Positioned(
-                              right: 0,
-                              top: 0,
-                              child: Container(
-                                padding: const EdgeInsets.all(3),
-                                decoration: const BoxDecoration(
-                                    color: Color(0xFF6500B2),
-                                    shape: BoxShape.circle),
-                                child: Text('${state.cartCount}',
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.bold)),
-                              ),
-                            ),
-                        ],
-                      ),
                     ),
                   ),
                 ],
@@ -164,7 +122,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             ),
 
             // Informações
-            Container(
+            Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,45 +132,43 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     children: [
                       Text(
                         widget.produto is Buque ? 'Buquês' : 'Pelúcias',
-                        style: GoogleFonts.montserrat(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey.shade600),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                        ),
                       ),
                       TextButton(
                         onPressed: () {},
-                        style: TextButton.styleFrom(
-                            foregroundColor: const Color(0xFF6500B2)),
-                        child: Text('Ver avaliações',
-                            style: GoogleFonts.interTight(
-                                fontWeight: FontWeight.w600)),
+                        child: const Text(
+                          'Ver avaliações',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF881F72),
+                          ),
+                        ),
                       ),
                     ],
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
                         child: Text(
                           widget.produto.nome,
-                          style: GoogleFonts.montserrat(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       Row(
                         children: [
-                          const Icon(Icons.star,
-                              color: Color(0xFFFFB700), size: 24),
-                          const SizedBox(width: 4),
-                          Text(
-                            widget.produto.avaliacao.toString(),
-                            style: GoogleFonts.montserrat(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey.shade700),
+                          const Icon(
+                            Icons.star,
+                            color: Color(0xFFFFB700),
+                            size: 20,
                           ),
+                          Text(' ${widget.produto.avaliacao}'),
                         ],
                       ),
                     ],
@@ -223,10 +179,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     children: [
                       Text(
                         'R\$ ${widget.produto.preco.toStringAsFixed(2).replaceAll('.', ',')}',
-                        style: GoogleFonts.montserrat(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF6500B2)),
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF881F72),
+                        ),
                       ),
                       Container(
                         decoration: BoxDecoration(
@@ -237,18 +194,21 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           children: [
                             IconButton(
                               icon: const Icon(Icons.remove, size: 20),
-                              color: _quantidade > 1
-                                  ? Colors.black
-                                  : Colors.grey,
                               onPressed: _decrementar,
                             ),
-                            Text('$_quantidade',
-                                style: GoogleFonts.interTight(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold)),
+                            Text(
+                              '$_quantidade',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             IconButton(
-                              icon: const Icon(Icons.add, size: 20),
-                              color: const Color(0xFF6500B2),
+                              icon: const Icon(
+                                Icons.add,
+                                size: 20,
+                                color: Color(0xFF881F72),
+                              ),
                               onPressed: _incrementar,
                             ),
                           ],
@@ -257,61 +217,36 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  Text('Product Details',
-                      style: GoogleFonts.montserrat(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Detalhes do Produto',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 10),
                   Text(
-                    'Um buquê bem cuidado dura de 5 a 14 dias. Retire folhas submersas, troque a água a cada 2 dias e mantenha longe do calor e frutas para evitar maturação precoce.',
-                    style: GoogleFonts.montserrat(
-                        fontSize: 14,
-                        color: Colors.grey.shade700,
-                        height: 1.6),
+                    'Um buquê bem cuidado dura de 5 a 14 dias. Retire folhas submersas, troque a água a cada 2 dias e mantenha longe do calor.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade700,
+                      height: 1.6,
+                    ),
                   ),
                   const SizedBox(height: 32),
-
-                  // Botões de ação
                   Row(
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {
-                            state.toggleWishlist(widget.produto);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  isWished
-                                      ? 'Removed from wishlist'
-                                      : 'Added to wishlist!',
-                                  style: GoogleFonts.montserrat(),
-                                ),
-                                backgroundColor:
-                                    isWished ? Colors.grey : Colors.pink,
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(12)),
-                                duration: const Duration(seconds: 1),
-                              ),
-                            );
-                          },
+                          onPressed: () => state.toggleWishlist(widget.produto),
                           icon: Icon(
-                            isWished
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            color: isWished ? Colors.red : const Color(0xFF6500B2),
+                            isWished ? Icons.favorite : Icons.favorite_border,
+                            color: const Color(0xFF881F72),
                           ),
-                          label: Text('Wishlist',
-                              style: GoogleFonts.montserrat(
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF6500B2))),
+                          label: const Text(
+                            'Favoritar',
+                            style: TextStyle(color: Color(0xFF881F72)),
+                          ),
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(
-                                color: Color(0xFF6500B2)),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24)),
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 14),
+                            side: const BorderSide(color: Color(0xFF881F72)),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                         ),
                       ),
@@ -321,27 +256,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         child: PrimaryButton(
                           text: 'Adicionar ao Carrinho',
                           onPressed: () {
-                            state.addToCart(widget.produto,
-                                quantidade: _quantidade);
+                            state.addToCart(
+                              widget.produto,
+                              quantidade: _quantidade,
+                            );
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                    '$_quantidade x ${widget.produto.nome} adicionado!',
-                                    style: GoogleFonts.montserrat()),
-                                backgroundColor:
-                                    const Color(0xFF6500B2),
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(12)),
+                                  '$_quantidade x ${widget.produto.nome} adicionado!',
+                                ),
+                                backgroundColor: const Color(0xFF881F72),
                                 action: SnackBarAction(
                                   label: 'Ver Carrinho',
                                   textColor: Colors.white,
                                   onPressed: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (_) =>
-                                              const CartScreen())),
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const CartScreen(),
+                                    ),
+                                  ),
                                 ),
                               ),
                             );

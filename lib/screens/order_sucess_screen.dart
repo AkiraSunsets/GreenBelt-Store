@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../models/app_state.dart';
+// Certifique-se de importar o arquivo da sua tela inicial aqui:
+import 'home_screen.dart'; 
 
 class OrderSuccessScreen extends StatelessWidget {
   const OrderSuccessScreen({super.key});
@@ -14,7 +17,7 @@ class OrderSuccessScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Ícone de Sucesso Animado ou Estático
+            // Ícone de Sucesso
             Container(
               padding: const EdgeInsets.all(24),
               decoration: const BoxDecoration(
@@ -29,7 +32,7 @@ class OrderSuccessScreen extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             
-            // Título Principal
+            // Título
             Text(
               'Pagamento Realizado!',
               style: GoogleFonts.montserrat(
@@ -40,7 +43,6 @@ class OrderSuccessScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             
-            // Texto de Apoio
             Text(
               'Seu pedido foi confirmado com sucesso.\nObrigado por comprar na GreenBelt!',
               textAlign: TextAlign.center,
@@ -58,8 +60,15 @@ class OrderSuccessScreen extends StatelessWidget {
               height: 56,
               child: ElevatedButton(
                 onPressed: () {
-                  // Volta para a primeira tela do App (Home) limpando a pilha
-                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  
+                  // 1. Limpa o carrinho
+                  AppStateProvider.of(context).clearCart();
+
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HomeScreen()),
+                    (route) => false,
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF881F72),

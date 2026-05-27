@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart' as smooth_page_indicator;
+import 'package:smooth_page_indicator/smooth_page_indicator.dart'
+    as smooth_page_indicator;
 import 'package:greenbelt_flutter/screens/start_screen.dart';
 
 class TesteSplashScreen extends StatefulWidget {
@@ -12,25 +13,35 @@ class TesteSplashScreen extends StatefulWidget {
 
 class _TesteSplashScreenState extends State<TesteSplashScreen> {
   final PageController _pageController = PageController();
+  int _currentIndex = 0;
 
   final List<Map<String, String>> splashData = [
     {
-      "image": "https://images.unsplash.com/photo-1582794543139-8ac9cb0f7b11?auto=format&fit=crop&w=1080&q=80",
-      "title1": "Seamless",
-      "title2": "Flower",
-      "subtitle": "Shopping Experience",
+      "image":
+          "https://images.unsplash.com/photo-1582794543139-8ac9cb0f7b11?auto=format&fit=crop&w=1080&q=80",
+      "title1": "Bem-vindo à",
+      "title2": "GreenBelt",
+      "subtitle": "Sua melhor experiência botânica",
+      "body":
+          "Encontre as flores perfeitas para alegrar o seu dia ou presentear quem você ama com muita praticidade.",
     },
     {
-      "image": "https://images.unsplash.com/photo-1615280825886-fa817c0a06cc?auto=format&fit=crop&w=1080&q=80",
-      "title1": "Craft",
-      "title2": "Your Ultimate",
-      "subtitle": "Floral Collection",
+      "image":
+          "https://images.unsplash.com/photo-1615280825886-fa817c0a06cc?auto=format&fit=crop&w=1080&q=80",
+      "title1": "Buquês e",
+      "title2": "Pelúcias",
+      "subtitle": "Para todas as ocasiões",
+      "body":
+          "Explore nossa coleção montada com carinho para transformar momentos simples em lembranças inesquecíveis.",
     },
     {
-      "image": "https://images.unsplash.com/photo-1468327768560-75b778cbb551?auto=format&fit=crop&w=1080&q=80",
-      "title1": "From Cart to Door",
-      "title2": "",
-      "subtitle": "Swift & Delivery Flower",
+      "image":
+          "https://images.unsplash.com/photo-1468327768560-75b778cbb551?auto=format&fit=crop&w=1080&q=80",
+      "title1": "Entrega",
+      "title2": "Rápida",
+      "subtitle": "Do carrinho até a sua porta",
+      "body":
+          "Garantimos que o seu pedido chegue fresco e no prazo exato, pronto para surpreender.",
     },
   ];
 
@@ -42,104 +53,134 @@ class _TesteSplashScreenState extends State<TesteSplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Pegando as dimensões da tela para ser responsivo
-    final size = MediaQuery.of(context).size;
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
-
     return Scaffold(
-      extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
       body: Stack(
         children: [
           PageView.builder(
             controller: _pageController,
             itemCount: splashData.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
             itemBuilder: (context, index) {
               final item = splashData[index];
 
-              // Usamos SingleChildScrollView para evitar overflow em telas pequenas
-              return SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SizedBox(
+              return Column(
+                children: [
+                  Expanded(
+                    flex: 55,
+                    child: Container(
                       width: double.infinity,
-                      height: size.height * 0.5, // Imagem ocupa 50% da altura da tela
-                      child: Image.network(
-                        item["image"]!,
-                        fit: BoxFit.cover,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(item["image"]!),
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
-                    SizedBox(height: size.height * 0.04),
+                  ),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          item["title1"]!,
-                          style: GoogleFonts.montserrat(
-                            color: const Color(0xFF881F72),
-                            fontSize: size.width * 0.065, // Fonte relativa à largura
-                            fontWeight: FontWeight.bold,
+                  Expanded(
+                    flex: 45, 
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 8,
+                            children: [
+                              Text(
+                                item["title1"]!,
+                                style: GoogleFonts.montserrat(
+                                  color: const Color(0xFF881F72),
+                                  fontSize:
+                                      28, 
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              if (item["title2"]!.isNotEmpty)
+                                Text(
+                                  item["title2"]!,
+                                  style: GoogleFonts.montserrat(
+                                    color: Colors.black,
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                            ],
                           ),
-                        ),
-                        if (item["title2"]!.isNotEmpty) ...[
-                          const SizedBox(width: 6),
+                          const SizedBox(height: 12),
                           Text(
-                            item["title2"]!,
+                            item["subtitle"]!,
+                            textAlign: TextAlign.center,
                             style: GoogleFonts.montserrat(
                               color: Colors.black,
-                              fontSize: size.width * 0.065,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
+                          const SizedBox(height: 16),
+                          Text(
+                            item["body"]!,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.montserrat(
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
+                              height: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 100),
                         ],
-                      ],
-                    ),
-
-                    SizedBox(height: size.height * 0.015),
-
-                    Text(
-                      item["subtitle"]!,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.montserrat(
-                        color: Colors.black,
-                        fontSize: size.width * 0.065,
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
+                  ),
+                ],
+              );
+            },
+          ),
 
-                    SizedBox(height: size.height * 0.03),
-
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: size.width * 0.08),
-                      child: Text(
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam volutpat eu turpis sit amet.',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.montserrat(
-                          color: Colors.black87,
-                          fontSize: size.width * 0.04,
-                          height: 1.5,
-                        ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    smooth_page_indicator.SmoothPageIndicator(
+                      controller: _pageController,
+                      count: splashData.length,
+                      effect: const smooth_page_indicator.SlideEffect(
+                        spacing: 8,
+                        radius: 10,
+                        dotWidth: 18,
+                        dotHeight: 8,
+                        dotColor: Color(0xFFEBEBEB),
+                        activeDotColor: Color(0xFF881F72),
                       ),
                     ),
-
-                    SizedBox(height: size.height * 0.05),
-
-                    // Botão responsivo usando largura relativa
+                    const SizedBox(height: 32),
                     SizedBox(
-                      width: size.width * 0.8,
-                      height: 55,
+                      width: double.infinity,
+                      height: 56,
                       child: ElevatedButton(
                         onPressed: () {
-                          if (index < splashData.length - 1) {
+                          if (_currentIndex == splashData.length - 1) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const StartScreen(),
+                              ),
+                            );
+                          } else {
                             _pageController.nextPage(
                               duration: const Duration(milliseconds: 500),
                               curve: Curves.ease,
-                            );
-                          } else {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => const StartScreen()),
                             );
                           }
                         },
@@ -151,38 +192,19 @@ class _TesteSplashScreenState extends State<TesteSplashScreen> {
                           ),
                         ),
                         child: Text(
-                          index == splashData.length - 1 ? 'Começar' : 'Próximo',
+                          _currentIndex == splashData.length - 1
+                              ? 'COMEÇAR'
+                              : 'PRÓXIMO',
                           style: GoogleFonts.montserrat(
                             color: Colors.white,
-                            fontSize: size.width * 0.045,
-                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.0,
                           ),
                         ),
                       ),
                     ),
-                    
-                    // Espaçamento extra dinâmico para garantir que não corte no rodapé
-                    SizedBox(height: bottomPadding + 80),
                   ],
-                ),
-              );
-            },
-          ),
-
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: EdgeInsets.only(bottom: bottomPadding + 20),
-              child: smooth_page_indicator.SmoothPageIndicator(
-                controller: _pageController,
-                count: splashData.length,
-                effect: const smooth_page_indicator.SlideEffect(
-                  spacing: 8,
-                  radius: 10,
-                  dotWidth: 18,
-                  dotHeight: 8,
-                  dotColor: Color(0xFFD9D9D9),
-                  activeDotColor: Color(0xFF881F72),
                 ),
               ),
             ),

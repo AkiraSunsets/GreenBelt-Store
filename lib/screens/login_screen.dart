@@ -73,25 +73,25 @@ class _TelaLoginWidgetState extends State<TelaLoginWidget> {
                 const Icon(Icons.spa_outlined, color: Color(0xFF881F72), size: 100),
                 const SizedBox(height: 30),
                 Text(
-                  'Sign In',
+                  'Entrar',
                   style: GoogleFonts.montserrat(fontSize: 25, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Hi! Welcome back, you\'ve been missed',
+                  'Olá! Bem-vindo de volta à GreenBelt.',
                   style: GoogleFonts.montserrat(fontSize: 14, color: Colors.grey.shade700),
                 ),
                 const SizedBox(height: 40),
                 CustomTextField(
                   controller: _emailController,
-                  label: 'Email',
-                  hintText: 'email@example.com',
+                  label: 'E-mail',
+                  hintText: 'seu@email.com',
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 20),
                 CustomTextField(
                   controller: _passwordController,
-                  label: 'Password',
+                  label: 'Senha',
                   hintText: '********',
                   isPassword: true,
                 ),
@@ -99,9 +99,11 @@ class _TelaLoginWidgetState extends State<TelaLoginWidget> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      // Lógica de esqueci a senha (futuro)
+                    },
                     child: Text(
-                      'Forget Password?',
+                      'Esqueceu a senha?',
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -114,7 +116,7 @@ class _TelaLoginWidgetState extends State<TelaLoginWidget> {
                 const SizedBox(height: 30),
                 _isLoading
                     ? const CircularProgressIndicator(color: Color(0xFF881F72))
-                    : PrimaryButton(text: 'Sign In', onPressed: _handleSignIn),
+                    : PrimaryButton(text: 'ENTRAR', onPressed: _handleSignIn),
                 const SizedBox(height: 24),
 
                 // Link para cadastro
@@ -122,7 +124,7 @@ class _TelaLoginWidgetState extends State<TelaLoginWidget> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Don't have an account?",
+                      "Não tem uma conta?",
                       style: GoogleFonts.montserrat(
                           fontSize: 14, fontWeight: FontWeight.w600),
                     ),
@@ -133,7 +135,7 @@ class _TelaLoginWidgetState extends State<TelaLoginWidget> {
                         MaterialPageRoute(builder: (_) => const RegisterScreen()),
                       ),
                       child: Text(
-                        'Sign Up',
+                        'Cadastre-se',
                         style: GoogleFonts.montserrat(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -148,14 +150,15 @@ class _TelaLoginWidgetState extends State<TelaLoginWidget> {
                 const SizedBox(height: 40),
                 const SizedBox(width: 300, child: Divider(thickness: 1.5, color: Colors.black12)),
                 const SizedBox(height: 20),
+                
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SocialIconButton(iconData: Icons.apple_sharp, onTap: () {}),
+                    SocialIconButton(iconData: Icons.g_mobiledata, onTap: () {}), // Ícone genérico para Google
                     const SizedBox(width: 20),
-                    SocialIconButton(iconData: Icons.apple_sharp, onTap: () {}),
+                    SocialIconButton(iconData: Icons.apple, onTap: () {}),
                     const SizedBox(width: 20),
-                    SocialIconButton(iconData: Icons.apple_sharp, onTap: () {}),
+                    SocialIconButton(iconData: Icons.facebook, onTap: () {}),
                   ],
                 ),
               ],

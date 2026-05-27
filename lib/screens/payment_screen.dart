@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/app_state.dart';
-import '../services/database_service.dart';
-import '../services/export_service.dart';
-import '../services/produto_service.dart';
-import '../screens/order_sucess_screen.dart'; // Import da tela de sucesso
-import '../services/current_service.dart';
+import 'order_sucess_screen.dart';
 
 class PaymentScreen extends StatefulWidget {
   final double total;
   final String frete;
   final String endereco;
 
-  const PaymentScreen({super.key, required this.total, required this.frete, required this.endereco});
+  const PaymentScreen({
+    super.key,
+    required this.total,
+    required this.frete,
+    required this.endereco,
+  });
 
   @override
   State<PaymentScreen> createState() => _PaymentScreenState();
@@ -20,47 +21,11 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen> {
   String _metodoPagamento = 'Cartão de Crédito';
-  double _taxaDolar = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _carregarCambio();
-  }
+  // Navegação direta e limpa para evitar travamentos
+  void _finalizarPedido(AppState state) {
+    state.clearCart(); // Limpa o carrinho antes de sair
 
-  // [C8] Requisito: Integração de Múltiplas APIs
-  Future<void> _carregarCambio() async {
-    final taxa = await CurrencyService.getUsdRate();
-    setState(() => _taxaDolar = taxa);
-  }
-
-  Future<void> _finalizarTudo(AppState state) async {
-    final itens = state.cartItems.map((i) => {
-      'nome': i.produto.nome,
-      'quantidade': i.quantidade,
-      'subtotal': i.subtotal,
-    }).toList();
-
-    // [C7] Requisito: Persistência Interna (SQLite)
-    await DatabaseService.salvarPedido(
-      total: widget.total,
-      frete: widget.frete,
-      itens: itens,
-    );
-
-    // [C7] Requisito: Persistência Externa (Arquivo TXT)
-    String conteudo = "COMPROVANTE GREENBELT\n"
-        "Endereço: ${widget.endereco}\n"
-        "Total: R\$ ${widget.total.toStringAsFixed(2)}\n"
-        "Método: $_metodoPagamento";
-    await ExportService.exportarPedidoParaArquivo(conteudo);
-
-    state.clearCart();
-
-    if (!mounted) return;
-    
-    // --- AQUI ESTÁ O CAMINHO PARA A TELA DE ORDER SUCCESS ---
-    // O const já está aplicado corretamente aqui!
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const OrderSuccessScreen()),
@@ -73,42 +38,92 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final state = AppStateProvider.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Pagamento")),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          "Pagamento",
+          style: GoogleFonts.montserrat(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Total a pagar: R\$ ${widget.total.toStringAsFixed(2)}", 
-              style: GoogleFonts.montserrat(fontSize: 20, fontWeight: FontWeight.bold)),
-            
-            if (_taxaDolar > 0)
-              Text("(Valor em Dólar: \$ ${(widget.total / _taxaDolar).toStringAsFixed(2)})",
-                style: const TextStyle(color: Colors.grey)),
+            Text(
+              "Total a pagar",
+              style: GoogleFonts.montserrat(color: Colors.grey.shade600),
+            ),
+            Text(
+              "R\$ ${widget.total.toStringAsFixed(2).replaceAll('.', ',')}",
+              style: GoogleFonts.montserrat(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF881F72),
+              ),
+            ),
 
-            const SizedBox(height: 30),
-            const Text("Selecione o método:"),
-            ListTile(
-              title: const Text("Cartão de Crédito"),
-              leading: Radio(value: 'Cartão', groupValue: _metodoPagamento, onChanged: (v) => setState(() => _metodoPagamento = v!)),
+            const SizedBox(height: 40),
+            Text(
+              "Método de Pagamento",
+              style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
             ),
-            ListTile(
-              title: const Text("Pix"),
-              leading: Radio(value: 'Pix', groupValue: _metodoPagamento, onChanged: (v) => setState(() => _metodoPagamento = v!)),
-            ),
+            const SizedBox(height: 10),
+
+            _buildRadioOption('Cartão de Crédito', Icons.credit_card),
+            _buildRadioOption('Pix', Icons.qr_code),
+
             const Spacer(),
+
             SizedBox(
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF881F72)),
-                // O botão chama a função que faz toda a lógica e navega no final
-                onPressed: () => _finalizarTudo(state),
-                child: const Text("CONFIRMAR E PAGAR", style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF881F72),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                ),
+                onPressed: () => _finalizarPedido(state),
+                child: Text(
+                  "CONFIRMAR E PAGAR",
+                  style: GoogleFonts.montserrat(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            )
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildRadioOption(String valor, IconData icone) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: RadioListTile(
+        title: Text(valor, style: GoogleFonts.montserrat()),
+        value: valor,
+        groupValue: _metodoPagamento,
+        secondary: Icon(icone, color: const Color(0xFF881F72)),
+        onChanged: (v) => setState(() => _metodoPagamento = v!),
       ),
     );
   }

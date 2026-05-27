@@ -12,28 +12,16 @@ class WishlistScreen extends StatefulWidget {
   State<WishlistScreen> createState() => _WishlistScreenState();
 }
 
-class _WishlistScreenState extends State<WishlistScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  String _selectedCategory = 'All';
-  final List<String> _categories = ['All', 'Bouquets', 'Flowers', 'Bears'];
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+class _WishlistScreenState extends State<WishlistScreen> {
+  String _selectedCategory = 'Todos';
+  
+  // Categorias padronizadas com a Home
+  final List<String> _categories = ['Todos', 'Buquês', 'Flores', 'Pelúcias'];
 
   List<Produto> _filtered(List<Produto> items) {
-    if (_selectedCategory == 'All') return items;
+    if (_selectedCategory == 'Todos') return items;
     return items.where((p) {
-      if (_selectedCategory == 'Bears') return p is Pelucia;
+      if (_selectedCategory == 'Pelúcias') return p is Pelucia;
       return p is Buque;
     }).toList();
   }
@@ -49,12 +37,9 @@ class _WishlistScreenState extends State<WishlistScreen>
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
+
         title: Text(
-          'My Wishlist',
+          'Meus Favoritos',
           style: GoogleFonts.montserrat(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -62,98 +47,66 @@ class _WishlistScreenState extends State<WishlistScreen>
           ),
         ),
         centerTitle: true,
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: const Color(0xFF6500B2),
-          unselectedLabelColor: Colors.grey.shade500,
-          indicatorColor: const Color(0xFF6500B2),
-          indicatorWeight: 2.5,
-          labelStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w700, fontSize: 15),
-          unselectedLabelStyle:
-              GoogleFonts.montserrat(fontWeight: FontWeight.w500, fontSize: 15),
-          tabs: const [Tab(text: 'Products'), Tab(text: 'Florists')],
-        ),
       ),
-      body: TabBarView(
-        controller: _tabController,
+      body: Column(
         children: [
-          // ---- ABA PRODUTOS ----
-          Column(
-            children: [
-              const SizedBox(height: 16),
-              // Categorias
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: _categories.map((cat) {
-                    final sel = _selectedCategory == cat;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: GestureDetector(
-                        onTap: () => setState(() => _selectedCategory = cat),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: sel
-                                ? const Color(0xFF6500B2)
-                                : Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Text(
-                            cat,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: sel ? Colors.white : Colors.black87,
-                            ),
-                          ),
+          const SizedBox(height: 16),
+          // Categorias com espaçamento perfeito no início e no fim
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: _categories.asMap().entries.map((entry) {
+                int index = entry.key;
+                String cat = entry.value;
+                bool isLast = index == _categories.length - 1;
+                final sel = _selectedCategory == cat;
+
+                return Padding(
+                  padding: EdgeInsets.only(right: isLast ? 0 : 10),
+                  child: GestureDetector(
+                    onTap: () => setState(() => _selectedCategory = cat),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: sel
+                            ? const Color(0xFF881F72)
+                            : Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: Text(
+                        cat,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: sel ? Colors.white : Colors.black87,
                         ),
                       ),
-                    );
-                  }).toList(),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Grid
-              Expanded(
-                child: filtered.isEmpty
-                    ? _emptyWishlist()
-                    : GridView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 14,
-                          mainAxisSpacing: 14,
-                          childAspectRatio: 0.72,
-                        ),
-                        itemCount: filtered.length,
-                        itemBuilder: (context, i) =>
-                            _WishlistCard(produto: filtered[i]),
-                      ),
-              ),
-            ],
-          ),
-
-          // ---- ABA FLORISTS (placeholder) ----
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.storefront_outlined,
-                    size: 64, color: Colors.grey.shade300),
-                const SizedBox(height: 16),
-                Text(
-                  'No florists saved yet',
-                  style: GoogleFonts.montserrat(
-                      fontSize: 16, color: Colors.grey.shade500),
-                ),
-              ],
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
+          ),
+          const SizedBox(height: 16),
+
+          // Grid de Produtos ou Tela Vazia
+          Expanded(
+            child: filtered.isEmpty
+                ? _emptyWishlist()
+                : GridView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 14,
+                      mainAxisSpacing: 14,
+                      childAspectRatio: 0.72,
+                    ),
+                    itemCount: filtered.length,
+                    itemBuilder: (context, i) =>
+                        _WishlistCard(produto: filtered[i]),
+                  ),
           ),
         ],
       ),
@@ -168,17 +121,22 @@ class _WishlistScreenState extends State<WishlistScreen>
           Icon(Icons.favorite_border, size: 72, color: Colors.grey.shade300),
           const SizedBox(height: 16),
           Text(
-            'Your wishlist is empty',
+            'Sua lista está vazia',
             style: GoogleFonts.montserrat(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey.shade500),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade600,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Tap the ♡ on any product to save it here',
+            'Toque no ♡ em qualquer produto\npara salvá-lo aqui',
+            textAlign: TextAlign.center,
             style: GoogleFonts.montserrat(
-                fontSize: 13, color: Colors.grey.shade400),
+              fontSize: 13,
+              color: Colors.grey.shade400,
+              height: 1.4,
+            ),
           ),
         ],
       ),
@@ -186,9 +144,6 @@ class _WishlistScreenState extends State<WishlistScreen>
   }
 }
 
-// ---------------------------------------------------------------------------
-// Card individual da Wishlist
-// ---------------------------------------------------------------------------
 class _WishlistCard extends StatelessWidget {
   final Produto produto;
   const _WishlistCard({required this.produto});
@@ -236,9 +191,10 @@ class _WishlistCard extends StatelessWidget {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 4,
-                              offset: Offset(0, 2))
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          )
                         ],
                       ),
                       child: const Icon(Icons.favorite,

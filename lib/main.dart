@@ -4,11 +4,7 @@ import 'package:greenbelt_flutter/models/app_state.dart';
 import 'package:greenbelt_flutter/screens/initial_screen.dart';
 
 void main() async {
-  // Garante que o Flutter esteja inicializado
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // REMOVEMOS AQUI AS CHAMADAS DE FFI QUE ESTAVAM CAUSANDO ERROS
-  
+  WidgetsFlutterBinding.ensureInitialized();  
   runApp(const MyApp());
 }
 

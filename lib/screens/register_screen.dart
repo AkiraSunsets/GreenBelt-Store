@@ -85,32 +85,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const Icon(Icons.spa_outlined, color: Color(0xFF881F72), size: 100),
                 const SizedBox(height: 30),
                 Text(
-                  'Create Account',
+                  'Criar Conta',
                   style: GoogleFonts.montserrat(fontSize: 25, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Fill your information or register\nwith your social account',
+                  'Preencha suas informações ou cadastre-se\ncom sua rede social',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.montserrat(fontSize: 14, color: Colors.grey.shade700),
                 ),
                 const SizedBox(height: 40),
                 CustomTextField(
                   controller: _nameController,
-                  label: 'Name',
-                  hintText: 'Ex: Akira Sunsets',
+                  label: 'Nome',
+                  hintText: 'Ex: Seu Nome Completo',
                 ),
                 const SizedBox(height: 20),
                 CustomTextField(
                   controller: _emailController,
-                  label: 'Email',
-                  hintText: 'email@example.com',
+                  label: 'E-mail',
+                  hintText: 'seu@email.com',
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 20),
                 CustomTextField(
                   controller: _passwordController,
-                  label: 'Password',
+                  label: 'Senha',
                   hintText: '********',
                   isPassword: true,
                 ),
@@ -118,40 +118,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Minimum 6 characters',
+                    'Mínimo de 6 caracteres',
                     style: GoogleFonts.montserrat(fontSize: 12, color: Colors.grey.shade500),
                   ),
                 ),
                 const SizedBox(height: 32),
                 _isLoading
                     ? const CircularProgressIndicator(color: Color(0xFF881F72))
-                    : PrimaryButton(text: 'Sign Up', onPressed: _handleSignUp),
+                    : PrimaryButton(text: 'CADASTRAR', onPressed: _handleSignUp),
                 const SizedBox(height: 40),
                 const SizedBox(width: 300, child: Divider(thickness: 1.5, color: Colors.black12)),
                 const SizedBox(height: 20),
+                
+                // Ícones sociais corrigidos
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SocialIconButton(iconData: Icons.apple_sharp, onTap: () {}),
+                    SocialIconButton(iconData: Icons.g_mobiledata, onTap: () {}),
                     const SizedBox(width: 20),
-                    SocialIconButton(iconData: Icons.apple_sharp, onTap: () {}),
+                    SocialIconButton(iconData: Icons.apple, onTap: () {}),
                     const SizedBox(width: 20),
-                    SocialIconButton(iconData: Icons.apple_sharp, onTap: () {}),
+                    SocialIconButton(iconData: Icons.facebook, onTap: () {}),
                   ],
                 ),
                 const SizedBox(height: 40),
+                
+                // Link para voltar ao Login
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Already have an account?',
+                      'Já possui uma conta?',
                       style: GoogleFonts.montserrat(fontSize: 14, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(width: 8),
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
                       child: Text(
-                        'Sign In',
+                        'Entrar',
                         style: GoogleFonts.montserrat(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,

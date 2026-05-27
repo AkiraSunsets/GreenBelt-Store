@@ -1,7 +1,3 @@
-// lib/screens/initial_screen.dart
-// C7: Verificação de sessão salva — se logado, vai direto para Home
-// Também restaura o nome do usuário no AppState via SharedPreferences
-
 import 'package:flutter/material.dart';
 import 'package:greenbelt_flutter/screens/home_screen.dart';
 import 'package:greenbelt_flutter/screens/onboarding_screen.dart';
@@ -26,13 +22,11 @@ class _StartAppState extends State<StartApp> {
     final logado = await AuthService.isLogado();
     if (!logado || !mounted) return;
 
-    // C7: Recupera os dados salvos localmente para restaurar o estado
     final nome = await AuthService.getNome();
     final email = await AuthService.getEmail();
 
     if (!mounted) return;
 
-    // Injeta o nome e email no AppState para que todas as telas recebam
     AppStateProvider.of(context).setUsuario(nome: nome, email: email);
 
     Navigator.pushReplacement(
@@ -49,10 +43,8 @@ class _StartAppState extends State<StartApp> {
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.spa_outlined,
-                  color: Color(0xFF881F72), size: 120),
+              const Icon(Icons.spa_outlined, color: Color(0xFF881F72), size: 120),
               const SizedBox(height: 20),
               const Text(
                 'Greenbelt Store',
@@ -65,17 +57,15 @@ class _StartAppState extends State<StartApp> {
                 child: ElevatedButton(
                   onPressed: () => Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (_) => const TesteSplashScreen()),
+                    MaterialPageRoute(builder: (_) => const TesteSplashScreen()),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF881F72),
                     elevation: 0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
                   ),
                   child: const Text(
-                    'Get Started',
+                    'Iniciar',
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

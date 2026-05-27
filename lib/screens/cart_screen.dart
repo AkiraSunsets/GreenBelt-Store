@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../models/app_state.dart';
 import 'checkout_screen.dart';
-import '../models/produto.dart';
+import '../components/card_tile.dart'; 
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -51,13 +51,13 @@ class _CartScreenState extends State<CartScreen> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Remove from Cart?',
+              'Remover do Carrinho?',
               style: GoogleFonts.montserrat(
                   fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
-              'Are you sure you want to remove "$name"?',
+              'Tem certeza de que deseja remover "$name"?',
               textAlign: TextAlign.center,
               style: GoogleFonts.montserrat(
                   fontSize: 14, color: Colors.grey.shade600),
@@ -74,7 +74,7 @@ class _CartScreenState extends State<CartScreen> {
                           borderRadius: BorderRadius.circular(50)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: Text('Cancel',
+                    child: Text('Cancelar',
                         style: GoogleFonts.montserrat(
                             color: const Color(0xFF881F72),
                             fontWeight: FontWeight.w600)),
@@ -91,7 +91,7 @@ class _CartScreenState extends State<CartScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       elevation: 0,
                     ),
-                    child: Text('Yes, Remove',
+                    child: Text('Sim, Remover',
                         style: GoogleFonts.montserrat(
                             color: Colors.white, fontWeight: FontWeight.w600)),
                   ),
@@ -144,12 +144,8 @@ class _CartScreenState extends State<CartScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
         title: Text(
-          'My Cart',
+          'Meu Carrinho',
           style: GoogleFonts.montserrat(
               fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
         ),
@@ -187,7 +183,9 @@ class _CartScreenState extends State<CartScreen> {
                           child: const Icon(Icons.delete_outline,
                               color: Colors.red, size: 28),
                         ),
-                        child: _CartTile(item: item),
+                        
+                        // Chamada super limpa do componente!
+                        child: CartTile(item: item),
                       );
                     },
                   ),
@@ -216,7 +214,7 @@ class _CartScreenState extends State<CartScreen> {
                             child: TextField(
                               controller: _promoController,
                               decoration: InputDecoration(
-                                hintText: 'Promo Code',
+                                hintText: 'Cupom de Desconto',
                                 hintStyle: GoogleFonts.montserrat(
                                     fontSize: 14,
                                     color: Colors.grey.shade400),
@@ -229,7 +227,7 @@ class _CartScreenState extends State<CartScreen> {
                                   borderSide: BorderSide.none,
                                 ),
                                 errorText:
-                                    _promoError ? 'Invalid code' : null,
+                                    _promoError ? 'Código inválido' : null,
                                 suffixIcon: _promoSuccess
                                     ? const Icon(Icons.check_circle,
                                         color: Colors.green)
@@ -253,7 +251,7 @@ class _CartScreenState extends State<CartScreen> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 14),
                             ),
-                            child: Text('Apply',
+                            child: Text('Aplicar',
                                 style: GoogleFonts.montserrat(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w600)),
@@ -266,20 +264,20 @@ class _CartScreenState extends State<CartScreen> {
                       const SizedBox(height: 8),
 
                       _summaryRow('Sub-Total',
-                          '\$${state.subTotal.toStringAsFixed(2)}'),
-                      _summaryRow('Delivery Charge',
-                          '\$${state.deliveryCharge.toStringAsFixed(2)}'),
+                          'R\$ ${state.subTotal.toStringAsFixed(2).replaceAll('.', ',')}'),
+                      _summaryRow('Taxa de Entrega',
+                          'R\$ ${state.deliveryCharge.toStringAsFixed(2).replaceAll('.', ',')}'),
                       _summaryRow(
-                          'Tax', '\$${state.tax.toStringAsFixed(2)}'),
+                          'Impostos', 'R\$ ${state.tax.toStringAsFixed(2).replaceAll('.', ',')}'),
                       if (state.discountValue > 0)
                         _summaryRow(
-                            'Discount',
-                            '-\$${state.discountValue.toStringAsFixed(2)}',
+                            'Desconto',
+                            '-R\$ ${state.discountValue.toStringAsFixed(2).replaceAll('.', ',')}',
                             valueColor: Colors.green),
                       const Divider(),
                       _summaryRow(
-                          'Total Cost',
-                          '\$${state.totalCost.toStringAsFixed(2)}',
+                          'Valor Total',
+                          'R\$ ${state.totalCost.toStringAsFixed(2).replaceAll('.', ',')}',
                           isTotal: true),
 
                       const SizedBox(height: 16),
@@ -301,7 +299,7 @@ class _CartScreenState extends State<CartScreen> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(50)),
                           ),
-                          child: Text('Proceed to Checkout',
+                          child: Text('Finalizar Compra',
                               style: GoogleFonts.montserrat(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w700,
@@ -324,147 +322,16 @@ class _CartScreenState extends State<CartScreen> {
           Icon(Icons.shopping_cart_outlined,
               size: 80, color: Colors.grey.shade300),
           const SizedBox(height: 16),
-          Text('Your cart is empty',
+          Text('Seu carrinho está vazio',
               style: GoogleFonts.montserrat(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Colors.grey.shade500)),
           const SizedBox(height: 8),
-          Text('Add some products to get started!',
+          Text('Adicione alguns produtos para começar!',
               style: GoogleFonts.montserrat(
                   fontSize: 13, color: Colors.grey.shade400)),
         ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Tile individual do carrinho
-// ---------------------------------------------------------------------------
-class _CartTile extends StatelessWidget {
-  final CartItem item;
-  const _CartTile({required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    final state = AppStateProvider.of(context);
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade100),
-      ),
-      child: Row(
-        children: [
-          // Imagem
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: SizedBox(
-              width: 72,
-              height: 72,
-              child: Image.network(item.produto.imagemUrl, fit: BoxFit.cover),
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          // Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.produto.nome,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.montserrat(
-                      fontSize: 14, fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  item.produto is Buque ? 'Bouquet' : 'Bear',
-                  style: GoogleFonts.montserrat(
-                      fontSize: 12, color: Colors.grey.shade500),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  '\$${item.produto.preco.toStringAsFixed(2)}',
-                  style: GoogleFonts.montserrat(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ),
-              ],
-            ),
-          ),
-
-          // Contador
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.grey.shade200),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _CounterBtn(
-                  icon: Icons.remove,
-                  color: item.quantidade > 1
-                      ? Colors.black
-                      : Colors.grey.shade300,
-                  onTap: () =>
-                      state.updateQuantity(item.produto.id, -1),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    '${item.quantidade}',
-                    style: GoogleFonts.montserrat(
-                        fontSize: 15, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                _CounterBtn(
-                  icon: Icons.add,
-                  color: const Color(0xFF6500B2),
-                  onTap: () =>
-                      state.updateQuantity(item.produto.id, 1),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CounterBtn extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-  const _CounterBtn(
-      {required this.icon, required this.color, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: color == const Color(0xFF881F72)
-              ? const Color(0xFF881F72)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(icon,
-            size: 16,
-            color: color == const Color(0xFF881F72)
-                ? Colors.white
-                : color),
       ),
     );
   }

@@ -1,18 +1,98 @@
 [
   {
     "id": "1",
-    "nome": "Buquê Clássico",
+    "nome": "Buquê Clássico de Rosas",
     "preco": 89.90,
     "categoria": "Buquês",
-    "imagePath": "assets/images/1.jpg",
-    "descricao": "Um lindo buquê de rosas selecionadas."
+    "imagemUrl": "assets/images/buques/rosas.jpg",
+    "descricao": "Rosas vermelhas selecionadas para momentos inesquecíveis."
   },
   {
     "id": "2",
-    "nome": "Urso de Pelúcia",
-    "preco": 45.00,
+    "nome": "Girassóis Radiantes",
+    "preco": 79.90,
+    "categoria": "Buquês",
+    "imagemUrl": "assets/images/buques/girassois.jpg",
+    "descricao": "Buquê alegre com girassóis vibrantes e folhagens naturais."
+  },
+  {
+    "id": "3",
+    "nome": "Buquê Encanto Rosa",
+    "preco": 94.90,
+    "categoria": "Buquês",
+    "imagemUrl": "assets/images/buques/buque_rosa.jpg",
+    "descricao": "Mix de flores rosas delicadas para ocasiões especiais."
+  },
+  {
+    "id": "4",
+    "nome": "Rosas Brancas Elegance",
+    "preco": 124.90,
+    "categoria": "Buquês",
+    "imagemUrl": "assets/images/buques/rosas_brancas.jpg",
+    "descricao": "Buquê refinado com rosas brancas selecionadas."
+  },
+  {
+    "id": "5",
+    "nome": "Tulipas Coloridas",
+    "preco": 109.90,
+    "categoria": "Flores",
+    "imagemUrl": "assets/images/flores/tulipas.jpg",
+    "descricao": "Tulipas importadas em tons variados para surpreender."
+  },
+  {
+    "id": "6",
+    "nome": "Orquídea Premium",
+    "preco": 129.90,
+    "categoria": "Flores",
+    "imagemUrl": "assets/images/flores/orquidea.jpg",
+    "descricao": "Orquídea elegante em vaso decorativo para ambientes sofisticados."
+  },
+  {
+    "id": "7",
+    "nome": "Lavandas Aromáticas",
+    "preco": 69.90,
+    "categoria": "Flores",
+    "imagemUrl": "assets/images/flores/lavanda.jpg",
+    "descricao": "Lavandas frescas e perfumadas para decorar e relaxar."
+  },
+  {
+    "id": "8",
+    "nome": "Arranjo de Lírios Nobres",
+    "preco": 139.90,
+    "categoria": "Flores",
+    "imagemUrl": "assets/images/flores/lirios.jpg",
+    "descricao": "Lírios brancos perfumados em arranjo elegante."
+  },
+  {
+    "id": "9",
+    "nome": "Urso de Pelúcia Caramelo",
+    "preco": 59.90,
     "categoria": "Pelúcias",
-    "imagePath": "assets/images/2.jpg",
-    "descricao": "Pelúcia macia e fofa para presentear."
+    "imagemUrl": "assets/images/pelucias/urso.jpg",
+    "descricao": "Pelúcia macia e perfeita para presentear."
+  },
+  {
+    "id": "10",
+    "nome": "Coelho de Pelúcia",
+    "preco": 54.90,
+    "categoria": "Pelúcias",
+    "imagemUrl": "assets/images/pelucias/coelho.jpg",
+    "descricao": "Coelhinho fofo com toque suave e delicado."
+  },
+  {
+    "id": "11",
+    "nome": "Elefante de Pelúcia",
+    "preco": 64.90,
+    "categoria": "Pelúcias",
+    "imagemUrl": "assets/images/pelucias/elefante.jpg",
+    "descricao": "Pelúcia divertida e extremamente confortável."
+  },
+  {
+    "id": "12",
+    "nome": "Panda de Pelúcia",
+    "preco": 72.90,
+    "categoria": "Pelúcias",
+    "imagemUrl": "assets/images/pelucias/panda.jpg",
+    "descricao": "Panda fofinho ideal para decorar e abraçar."
   }
 ]
