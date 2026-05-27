@@ -11,7 +11,9 @@ class StartScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Metade superior: Imagem adaptável com bordas arredondadas
+          
+
+          //foto 
           Expanded(
             flex: 55,
             child: Container(
@@ -23,8 +25,8 @@ class StartScreen extends StatelessWidget {
                   bottomRight: Radius.circular(100),
                 ),
                 image: DecorationImage(
-                  image: NetworkImage(
-                    'https://images.unsplash.com/photo-1538998073820-4dfa76300194?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHw0fHxmbG93ZXJ8ZW58MHx8fHwxNzc4ODI5NDk1fDA&ixlib=rb-4.1.0&q=80&w=1080',
+                  image: AssetImage(
+                    'assets/images/start.jpg',
                   ),
                   fit: BoxFit.cover,
                 ),
@@ -95,7 +97,7 @@ class StartScreen extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          'VAMOS COMEÇAR',
+                          'Começar',
                           style: GoogleFonts.montserrat(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,

@@ -44,12 +44,18 @@ class _StartAppState extends State<StartApp> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+
+              //icone
               const Icon(Icons.spa_outlined, color: Color(0xFF881F72), size: 120),
               const SizedBox(height: 20),
+
+              //titulo
               const Text(
                 'Greenbelt Store',
                 style: TextStyle(fontSize: 35, fontWeight: FontWeight.w600),
               ),
+
+              //button
               const SizedBox(height: 60),
               SizedBox(
                 width: 300,
@@ -64,6 +70,8 @@ class _StartAppState extends State<StartApp> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
                   ),
+
+                  //titulo iniciar
                   child: const Text(
                     'Iniciar',
                     style: TextStyle(

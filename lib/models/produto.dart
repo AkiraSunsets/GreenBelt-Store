@@ -1,11 +1,10 @@
-// lib/models/produto.dart
-
-// Classe abstrata base — C11: utilizando classes e POO
+// Classe abstrata base
 abstract class Produto {
   final String id;
   final String nome;
   final double preco;
   final String imagemUrl;
+  final String descricao;
   final double avaliacao;
   final int totalReviews;
 
@@ -14,25 +13,27 @@ abstract class Produto {
     required this.nome,
     required this.preco,
     required this.imagemUrl,
+    required this.descricao,
     required this.avaliacao,
     required this.totalReviews,
   });
 
-  // C11: getter abstrato — cada subclasse implementa de forma diferente
+  //cada subclasse implementa de forma diferente
   String get categoria;
 
-  // C11: método concreto — serializa os atributos comuns para JSON (usado no POST/PUT da API)
+  //serializa os atributos comuns para JSON 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'nome': nome,
-        'preco': preco,
-        'imagemUrl': imagemUrl,
-        'avaliacao': avaliacao,
-        'totalReviews': totalReviews,
-        'categoria': categoria, // usado pelo fromJson para saber qual subclasse criar
-      };
+    'id': id,
+    'nome': nome,
+    'preco': preco,
+    'imagemUrl': imagemUrl,
+    'avaliacao': avaliacao,
+    'totalReviews': totalReviews,
+    'categoria':
+        categoria, // usado pelo fromJson para saber qual subclasse criar
+  };
 
-  // C11: factory constructor — desserializa o JSON da API para o objeto correto
+  // desserializa o JSON da API para o objeto correto
   factory Produto.fromJson(Map<String, dynamic> json) {
     final cat = json['categoria'] ?? '';
     if (cat == 'Pelucia') {
@@ -41,7 +42,8 @@ abstract class Produto {
         nome: json['nome'] ?? '',
         preco: (json['preco'] as num).toDouble(),
         imagemUrl: json['imagemUrl'] ?? '',
-        avaliacao: (json['avaliacao'] as num?)?.toDouble() ?? 0.0,
+        descricao: json['descricao'] ?? '',
+        avaliacao: (json['avaliacao'] as num?)?.toDouble() ?? 5.0,
         totalReviews: json['totalReviews'] as int? ?? 0,
         tamanho: json['tamanho'] ?? 'Médio',
       );
@@ -52,14 +54,15 @@ abstract class Produto {
       nome: json['nome'] ?? '',
       preco: (json['preco'] as num).toDouble(),
       imagemUrl: json['imagemUrl'] ?? '',
-      avaliacao: (json['avaliacao'] as num?)?.toDouble() ?? 0.0,
+      avaliacao: (json['avaliacao'] as num?)?.toDouble() ?? 5.0,
       totalReviews: json['totalReviews'] as int? ?? 0,
+      descricao: json['descricao'] ?? '',
       tipoFlor: json['tipoFlor'] ?? 'Variado',
     );
   }
 }
 
-// C11: Subclasse 1 — Buquês
+// Subclasse 1 — Buquês
 class Buque extends Produto {
   final String tipoFlor;
 
@@ -71,17 +74,18 @@ class Buque extends Produto {
     required super.avaliacao,
     required super.totalReviews,
     required this.tipoFlor,
+    required super.descricao,
   });
 
   @override
   String get categoria => 'Buque';
 
-  // C11: override de toJson — adiciona campo específico da subclasse
+  // Adiciona campo específico da subclasse
   @override
   Map<String, dynamic> toJson() => {
-        ...super.toJson(), // aproveita os campos da superclasse
-        'tipoFlor': tipoFlor,
-      };
+    ...super.toJson(), // pega todos os campos da subclasse
+    'tipoFlor': tipoFlor,
+  };
 }
 
 // C11: Subclasse 2 — Pelúcias
@@ -95,21 +99,19 @@ class Pelucia extends Produto {
     required super.imagemUrl,
     required super.avaliacao,
     required super.totalReviews,
+    required super.descricao,
     required this.tamanho,
   });
 
   @override
   String get categoria => 'Pelucia';
 
-  // C11: override de toJson — adiciona campo específico da subclasse
+ 
   @override
-  Map<String, dynamic> toJson() => {
-        ...super.toJson(),
-        'tamanho': tamanho,
-      };
+  Map<String, dynamic> toJson() => {...super.toJson(), 'tamanho': tamanho};
 }
 
-// Lista mock — usada como fallback se a API estiver indisponível
+// Lista com dados mockados - usada como fallback se a API estiver indisponível
 final List<Produto> mockProdutos = [
   Buque(
     id: '1',
@@ -120,6 +122,7 @@ final List<Produto> mockProdutos = [
     avaliacao: 5.0,
     totalReviews: 25,
     tipoFlor: 'Rosas e Lírios',
+    descricao: '',
   ),
   Buque(
     id: '2',
@@ -130,6 +133,7 @@ final List<Produto> mockProdutos = [
     avaliacao: 4.8,
     totalReviews: 42,
     tipoFlor: 'Rosas',
+    descricao: '',
   ),
   Pelucia(
     id: '3',
@@ -140,5 +144,6 @@ final List<Produto> mockProdutos = [
     avaliacao: 4.5,
     totalReviews: 12,
     tamanho: 'Médio',
+    descricao: '',
   ),
 ];
