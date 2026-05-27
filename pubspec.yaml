@@ -71,16 +71,16 @@ flutter:
     - assets/images/3.jpg
     - assets/data/produtos.json
     - assets/images/profile.jpg
-    - assets/images/rosas.jpg
+    - assets/images/rosas.jpg 
     - assets/images/girassois.jpg
     - assets/images/tulipas.jpg
     - assets/images/orquidea.jpg
     - assets/images/lavanda.jpg
     - assets/images/lirios.jpg
-    - assets/images/flores_campo.jpg
-    - assets/images/suculentas.jpg
-    - assets/images/buque_rosa.jpg
-    - assets/images/rosas_brancas.jpg             
+    - assets/images/coelho.jpg
+    - assets/images/elefante.jpg
+    - assets/images/urso.jpg
+    - assets/images/panda.jpg           
     - db.json
 
 
