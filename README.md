@@ -1,5 +1,18 @@
 # 🌿 Greenbelt Store
 
+<div align="center">
+
+![Flutter](https://img.shields.io/badge/Flutter-02569B?style=flat-square&logo=flutter&logoColor=white)
+![Dart](https://img.shields.io/badge/Dart-0175C2?style=flat-square&logo=dart&logoColor=white)
+![Mobile](https://img.shields.io/badge/Mobile-Android%20%7C%20iOS-brightgreen?style=flat-square&logo=android&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
+![SENAI](https://img.shields.io/badge/SENAI-Roberto%20Mange-red?style=flat-square)
+
+</div>
+
+---
+
 O **Greenbelt Store** é um aplicativo de e-commerce focado na venda de buquês, flores e pelúcias. O projeto foi desenvolvido em Flutter para atender ao desafio proposto pela agência digital fictícia "Digital Horizon", com o objetivo de criar um app para apoiar o comércio e serviços locais.
 
 ---
@@ -31,6 +44,18 @@ O desenvolvimento deste aplicativo permitiu a aplicação de diversas competênc
 ---
 
 ## ✨ Funcionalidades
+
+<div align="center">
+
+![Onboarding](https://img.shields.io/badge/🎬-Onboarding-blue?style=flat-square)
+![Catálogo](https://img.shields.io/badge/🛍️-Catálogo%20Dinâmico-green?style=flat-square)
+![Detalhes](https://img.shields.io/badge/📸-Detalhes-purple?style=flat-square)
+![Favoritos](https://img.shields.io/badge/❤️-Favoritos-red?style=flat-square)
+![Carrinho](https://img.shields.io/badge/🛒-Carrinho-orange?style=flat-square)
+![Checkout](https://img.shields.io/badge/💳-Checkout-cyan?style=flat-square)
+![Perfil](https://img.shields.io/badge/👤-Perfil-pink?style=flat-square)
+
+</div>
 
 - 🎬 **Onboarding & Splash Screen:** Telas iniciais atrativas para apresentação do serviço
 - 🛍️ **Catálogo Dinâmico:** Produtos organizados por categorias com barra de busca e carrossel de ofertas
@@ -115,7 +140,3 @@ Este projeto foi desenvolvido como parte do curso de Técnico em Desenvolvimento
 ## 👨‍💻 Autor
 
 Desenvolvido com dedicação para a conclusão do módulo Específico do SENAI Roberto Mange. 🎓
-
----
-
-**Desenvolvido com ❤️ em Flutter**
