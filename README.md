@@ -1,4 +1,4 @@
-# 🌿 Greenbelt Store
+# 🌷 Greenbelt Store
 
 <div align="center">
 
