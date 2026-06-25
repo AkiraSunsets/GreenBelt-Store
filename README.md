@@ -45,18 +45,6 @@ O desenvolvimento deste aplicativo permitiu a aplicação de diversas competênc
 
 ## ✨ Funcionalidades
 
-<div align="center">
-
-![Onboarding](https://img.shields.io/badge/🎬-Onboarding-blue?style=flat-square)
-![Catálogo](https://img.shields.io/badge/🛍️-Catálogo%20Dinâmico-green?style=flat-square)
-![Detalhes](https://img.shields.io/badge/📸-Detalhes-purple?style=flat-square)
-![Favoritos](https://img.shields.io/badge/❤️-Favoritos-red?style=flat-square)
-![Carrinho](https://img.shields.io/badge/🛒-Carrinho-orange?style=flat-square)
-![Checkout](https://img.shields.io/badge/💳-Checkout-cyan?style=flat-square)
-![Perfil](https://img.shields.io/badge/👤-Perfil-pink?style=flat-square)
-
-</div>
-
 - 🎬 **Onboarding & Splash Screen:** Telas iniciais atrativas para apresentação do serviço
 - 🛍️ **Catálogo Dinâmico:** Produtos organizados por categorias com barra de busca e carrossel de ofertas
 - 📸 **Detalhes e Interação:** Páginas de produto com carrossel de imagens, descrição detalhada e controle de quantidade
