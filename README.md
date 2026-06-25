@@ -5,7 +5,7 @@
 ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=flat-square&logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-0175C2?style=flat-square&logo=dart&logoColor=white)
 ![Mobile](https://img.shields.io/badge/Mobile-Android%20%7C%20iOS-brightgreen?style=flat-square&logo=android&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Concluído-green?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
 ![SENAI](https://img.shields.io/badge/SENAI-Roberto%20Mange-red?style=flat-square)
 
