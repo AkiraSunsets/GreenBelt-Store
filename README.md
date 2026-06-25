@@ -12,7 +12,7 @@ Este projeto é o resultado prático da **Situação de Aprendizagem 2 (SA2 - Da
 - **Curso:** Técnico em Desenvolvimento de Sistemas
 - **Unidade Curricular:** Programação para Dispositivos Móveis (PPDM)
 - **Docente Responsável:** Vinícius Almeida
-- **Turma:** 3DES-TB 
+- **Turmas:** 3DES-TB / 3DES-MB
 
 ---
 
@@ -44,12 +44,22 @@ O desenvolvimento deste aplicativo permitiu a aplicação de diversas competênc
 
 ## 🛠️ Tecnologias
 
-- **[Flutter](https://flutter.dev/)** - Framework de desenvolvimento mobile
-- **[Dart](https://dart.dev/)** - Linguagem de programação
-- **REST APIs** - Integração com serviços web
-- **Provider** - Gerenciamento de estado (`AppStateProvider`)
-- **google_fonts** - Tipografia (Montserrat)
-- **smooth_page_indicator** - Paginação de elementos visuais
+<div align="center">
+
+![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
+![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
+![REST API](https://img.shields.io/badge/REST%20API-009688?style=for-the-badge&logo=api&logoColor=white)
+![Provider](https://img.shields.io/badge/Provider-FF6B6B?style=for-the-badge&logo=flutter&logoColor=white)
+![Google Fonts](https://img.shields.io/badge/Google%20Fonts-4285F4?style=for-the-badge&logo=google&logoColor=white)
+
+</div>
+
+- 🎨 **[Flutter](https://flutter.dev/)** - Framework de desenvolvimento mobile
+- 🔵 **[Dart](https://dart.dev/)** - Linguagem de programação
+- 🌐 **REST APIs** - Integração com serviços web
+- 📦 **Provider** - Gerenciamento de estado (`AppStateProvider`)
+- ✍️ **google_fonts** - Tipografia (Montserrat)
+- 📖 **smooth_page_indicator** - Paginação de elementos visuais
 
 ---
 
@@ -105,3 +115,7 @@ Este projeto foi desenvolvido como parte do curso de Técnico em Desenvolvimento
 ## 👨‍💻 Autor
 
 Desenvolvido com dedicação para a conclusão do módulo Específico do SENAI Roberto Mange. 🎓
+
+---
+
+**Desenvolvido com ❤️ em Flutter**
